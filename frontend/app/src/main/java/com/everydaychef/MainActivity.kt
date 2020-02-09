@@ -6,14 +6,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.findNavController
@@ -24,14 +18,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -42,7 +30,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var loginViewModel: LoginViewModel
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
@@ -75,25 +62,23 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
     }
 
     private fun updateUI(){
-        Log.println(Log.DEBUG, "PRINT", "Updating UI with and is the user signed in: " + loginViewModel.isUserSignedIn())
         if(!loginViewModel.isUserSignedIn()){
             user_name.visibility = View.GONE
             user_email.text = getString(R.string.nav_header_login_first)
             sign_in_button.setOnClickListener(this)
+            regular_sign_in_button.setOnClickListener(this)
             user_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person))
         } else {
             user_name.visibility = View.VISIBLE
             user_email.text = loginViewModel.email.value
             user_name.text = loginViewModel.username.value
-            Log.println(Log.DEBUG, "PRINT", "The photoURL for this user is: " + loginViewModel.photoURL.value)
             if(loginViewModel.photoURL.value != "null"){
-                Log.println(Log.DEBUG, "PRINT", "This is not working!")
                 Glide.with(this).load(loginViewModel.photoURL).into(user_image)
             }
         }
     }
 
-    fun signOut(Item: MenuItem) {
+    fun signOut(item: MenuItem) {
         loginViewModel.signOut(this)
         updateUI()
     }
@@ -102,11 +87,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         when (p0?.id) {
             R.id.sign_in_button -> loginViewModel.googleSignIn(this)
             R.id.user_image -> {
-                if(loginViewModel.currentGoogleUser === null){
+                if(!loginViewModel.isUserSignedIn()){
                     loginViewModel.googleSignIn(this)
                 } else {
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.nav_shopping_list)
+                    findNavController(R.id.nav_host_fragment).navigate(R.id.nav_profile)
                 }
+            }
+            R.id.regular_sign_in_button -> {
+                val startLoginActivityIntent = Intent(this, LoginActivity::class.java)
+                startActivity(startLoginActivityIntent)
             }
         }
     }
@@ -123,12 +112,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
     private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
         try {
             loginViewModel.googleSignInSuccessfull(completedTask!!.getResult(ApiException::class.java)!!)
-//            loginViewModel.authenticationState.s(LoginViewModel.AuthenticationState.GOOGLE_AUTHENTICATED)
             updateUI()
         } catch (e: ApiException) {
             Log.println(Log.ERROR, "GOOGLE-SIGN-IN", e.printStackTrace().toString())
         }
     }
-
 }
 

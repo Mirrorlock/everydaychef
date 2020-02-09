@@ -93,7 +93,6 @@ class LoginViewModel : ViewModel() {
     }
 
     fun googleSignOut(activity: Activity){
-        Log.println(Log.DEBUG, "PRINT", "Signing out with " + authenticationState.value.toString())
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(activity) {
                     currentGoogleUser = null

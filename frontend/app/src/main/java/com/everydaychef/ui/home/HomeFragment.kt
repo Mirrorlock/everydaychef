@@ -20,14 +20,14 @@ import com.google.android.gms.common.SignInButton
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlin.math.log
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), View.OnClickListener {
 
     private lateinit var homeViewModel: HomeViewModel
     private var loginViewModel: LoginViewModel? = null
 
     fun updateUI(){
+
         loginViewModel?.let {
-            Log.println(Log.DEBUG, "PRINT", "Updating UI - ${it.isUserSignedIn()}")
             if( it.isUserSignedIn() ) {
                 sign_in_button.visibility = View.GONE
                 regular_sign_in_button.visibility = View.GONE
@@ -36,9 +36,8 @@ class HomeFragment : Fragment() {
                 sign_in_button.visibility = View.VISIBLE
                 regular_sign_in_button.visibility = View.VISIBLE
                 register_button.visibility = View.VISIBLE
+                sign_in_button.setOnClickListener(this)
             }
-
-            Log.println(Log.DEBUG, "PRINT", "Email from updated UI is: " + it.email.value)
         }
     }
 
@@ -50,14 +49,17 @@ class HomeFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         activity?.let{
             loginViewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
-            loginViewModel?.authenticationState?.observe(viewLifecycleOwner, Observer {
+            loginViewModel?.authenticationState?.observe(this, Observer {
                 updateUI()
-            })
-            loginViewModel!!.email.observe(viewLifecycleOwner, Observer{
-                Log.println(Log.DEBUG, "PRINT",  "New email is: " + it)
             })
         }
         return root
+    }
+
+    override fun onClick(p0: View?) {
+        when(p0?.id){
+            R.id.sign_in_button -> activity?.let { loginViewModel?.googleSignIn(it) }
+        }
     }
 
 }
