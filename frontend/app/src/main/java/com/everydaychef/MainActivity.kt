@@ -32,14 +32,15 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.nav_header_main.*
 
 
 class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOwner {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var userImage: ImageView
-    private lateinit var userName: TextView
-    private lateinit var userEmail: TextView
     private lateinit var loginViewModel: LoginViewModel
 
 
@@ -48,42 +49,23 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         loginViewModel.setupGoogleSignIn(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
-
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home, R.id.nav_fridge, R.id.nav_cook,
                 R.id.nav_shopping_list, R.id.nav_share, R.id.nav_send, R.id.nav_profile
-            ), drawerLayout
+            ), drawer_layout
         )
-
-        loginViewModel.test.postValue(3)
-
         setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        nav_view.setupWithNavController(navController)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
-        userImage = findViewById(R.id.user_image)
-        userImage.setOnClickListener(this)
-        userName  = findViewById(R.id.user_name)
-        userEmail = findViewById(R.id.user_email)
+        user_image.setOnClickListener(this)
         updateUI()
-
         return true
     }
 
@@ -93,32 +75,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
     }
 
     private fun updateUI(){
-        val signInButton = findViewById<SignInButton>(R.id.sign_in_button)
-        val regularSignInButton = findViewById<Button>(R.id.regular_sign_in_button)
-        val registerButton = findViewById<Button>(R.id.register_button)
+        Log.println(Log.DEBUG, "PRINT", "Updating UI with and is the user signed in: " + loginViewModel.isUserSignedIn())
         if(!loginViewModel.isUserSignedIn()){
-            signInButton.visibility = View.VISIBLE
-            regularSignInButton.visibility = View.VISIBLE
-            registerButton.visibility = View.VISIBLE
-            userName.visibility = View.GONE
-            userEmail.text = getString(R.string.nav_header_login_first)
-            signInButton.setOnClickListener(this)
-            userImage.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person))
+            user_name.visibility = View.GONE
+            user_email.text = getString(R.string.nav_header_login_first)
+            sign_in_button.setOnClickListener(this)
+            user_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person))
         } else {
-            signInButton.visibility = View.GONE
-            regularSignInButton.visibility = View.GONE
-            registerButton.visibility = View.GONE
-            userName.visibility = View.VISIBLE
-            userEmail.text = loginViewModel.email
-            userName.text = loginViewModel.username
-            if(loginViewModel.photoURL != "") {
-                Glide.with(this).load(loginViewModel.photoURL).into(userImage)
+            user_name.visibility = View.VISIBLE
+            user_email.text = loginViewModel.email.value
+            user_name.text = loginViewModel.username.value
+            Log.println(Log.DEBUG, "PRINT", "The photoURL for this user is: " + loginViewModel.photoURL.value)
+            if(loginViewModel.photoURL.value != "null"){
+                Log.println(Log.DEBUG, "PRINT", "This is not working!")
+                Glide.with(this).load(loginViewModel.photoURL).into(user_image)
             }
         }
     }
 
     fun signOut(Item: MenuItem) {
         loginViewModel.signOut(this)
+        updateUI()
     }
 
     override fun onClick(p0: View?) {
@@ -134,14 +111,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         }
     }
 
-    fun signIn(view: View) {
-        loginViewModel.googleSignIn(this)
-    }
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode === loginViewModel.GOOGLE_SIGN_IN) {
+        if (requestCode == loginViewModel.RC_GOOGLE_SIGN_IN) {
             val task =
                 GoogleSignIn.getSignedInAccountFromIntent(data)
             handleGoogleSignInResult(task)

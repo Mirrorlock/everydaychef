@@ -17,22 +17,28 @@ import com.everydaychef.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.SignInButton
+import kotlinx.android.synthetic.main.fragment_home.*
 import kotlin.math.log
 
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
-    private var loginViewModel: LoginViewModel = LoginViewModel()
+    private var loginViewModel: LoginViewModel? = null
 
-    fun updateUI(root: View){
-        Log.println(Log.DEBUG, "PRINT", "Updating UI - ${loginViewModel.isUserSignedIn()}")
-        if( loginViewModel.isUserSignedIn() ) {
-            val googleSignInButton = root.findViewById<SignInButton>(R.id.sign_in_button)
-            val regularSignInButton = root.findViewById<Button>(R.id.regular_sign_in_button)
-            val registerButton = root.findViewById<Button>(R.id.register_button)
-            googleSignInButton.visibility = View.GONE
-            regularSignInButton.visibility = View.GONE
-            registerButton.visibility = View.GONE
+    fun updateUI(){
+        loginViewModel?.let {
+            Log.println(Log.DEBUG, "PRINT", "Updating UI - ${it.isUserSignedIn()}")
+            if( it.isUserSignedIn() ) {
+                sign_in_button.visibility = View.GONE
+                regular_sign_in_button.visibility = View.GONE
+                register_button.visibility = View.GONE
+            }else{
+                sign_in_button.visibility = View.VISIBLE
+                regular_sign_in_button.visibility = View.VISIBLE
+                register_button.visibility = View.VISIBLE
+            }
+
+            Log.println(Log.DEBUG, "PRINT", "Email from updated UI is: " + it.email.value)
         }
     }
 
@@ -41,27 +47,17 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-//        loginViewModel.authenticationState.observe(this, Observer {
-//            Log.println(Log.DEBUG, "PRINT", it.toString() + " has been changed!")
-//        })
-
         val root = inflater.inflate(R.layout.fragment_home, container, false)
-        updateUI(root)
-        return root
-    }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.println(Log.DEBUG, "PRINT", " View HOME has been created!")
         activity?.let{
-            loginViewModel =
-                ViewModelProviders.of(it).get(LoginViewModel::class.java)
-            loginViewModel.test.observe(viewLifecycleOwner, Observer {
-                Log.println(Log.DEBUG, "PRINT", "New value for test: " + it)
+            loginViewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
+            loginViewModel?.authenticationState?.observe(viewLifecycleOwner, Observer {
+                updateUI()
+            })
+            loginViewModel!!.email.observe(viewLifecycleOwner, Observer{
+                Log.println(Log.DEBUG, "PRINT",  "New email is: " + it)
             })
         }
+        return root
     }
 
 }

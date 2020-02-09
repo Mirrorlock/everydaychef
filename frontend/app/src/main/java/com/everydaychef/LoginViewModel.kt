@@ -26,20 +26,19 @@ class LoginViewModel : ViewModel() {
     }
 
     val authenticationState = MutableLiveData<AuthenticationState>()
-    var username: String
-    var test = MutableLiveData<Int>()
-    var email: String
-    var photoURL: String
+    var username = MutableLiveData<String>()
+    var email = MutableLiveData<String>()
+    var photoURL = MutableLiveData<String>()
 
     init {
         authenticationState.value = AuthenticationState.UNAUTHENTICATED
-        username = ""
-        email    = ""
-        photoURL = ""
+        username.value = ""
+        email.value    = ""
+        photoURL.value = ""
     }
 
     fun isUserSignedIn(): Boolean {
-        Log.println(Log.DEBUG, "PRINT", authenticationState.value.toString() + " from is user signed in!")
+//        Log.println(Log.DEBUG, "PRINT", authenticationState.value.toString() + " from is user signed in!")
         return authenticationState.value.toString().contains("_AUTHENTICATED")
     }
 
@@ -50,7 +49,7 @@ class LoginViewModel : ViewModel() {
     // MANUAL AUTHENTICATION //
     fun authenticate(username: String, password: String) {
         if (passwordIsValidForUsername(username, password)) {
-            this.username = username
+            this.username.value = username
             authenticationState.value = AuthenticationState.MANUALLY_AUTHENTICATED
         } else {
             authenticationState.value = AuthenticationState.INVALID_AUTHENTICATION
@@ -71,7 +70,7 @@ class LoginViewModel : ViewModel() {
     /// GOOGLE AUTHENTICATION ///
     internal lateinit var mGoogleSignInClient: GoogleSignInClient
     var currentGoogleUser: GoogleSignInAccount? = null
-    internal var GOOGLE_SIGN_IN = 7 // Google sign in request code
+    internal var RC_GOOGLE_SIGN_IN = 7 // Google sign in request code
 
     fun setupGoogleSignIn(context: Context){
         val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -83,29 +82,29 @@ class LoginViewModel : ViewModel() {
     fun googleSignIn(activity: Activity){
         Log.println(Log.INFO, "Action", "Started process: google sign in")
         val signInIntent: Intent = mGoogleSignInClient.signInIntent
-        activity.startActivityForResult(signInIntent, GOOGLE_SIGN_IN)
+        activity.startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
     }
 
     fun googleSignInSuccessfull(googleUser: GoogleSignInAccount){
         currentGoogleUser = googleUser
         fillDataFromGoogleAccount()
-//        authenticationState.value = AuthenticationState.GOOGLE_AUTHENTICATED
-        Log.println(Log.DEBUG, "PRINT", authenticationState.value.toString() + " google sign in successful")
+        authenticationState.value = AuthenticationState.GOOGLE_AUTHENTICATED
+//        Log.println(Log.DEBUG, "PRINT", authenticationState.value.toString() + " google sign in successful")
     }
 
     fun googleSignOut(activity: Activity){
-            mGoogleSignInClient.signOut()
+        Log.println(Log.DEBUG, "PRINT", "Signing out with " + authenticationState.value.toString())
+        mGoogleSignInClient.signOut()
                 .addOnCompleteListener(activity) {
                     currentGoogleUser = null
                 }
     }
 
     fun fillDataFromGoogleAccount() {
-        username = currentGoogleUser?.displayName.toString()
-        email    = currentGoogleUser?.email.toString()
-        photoURL = currentGoogleUser?.photoUrl.toString()
+        username.value = currentGoogleUser?.displayName.toString()
+        email.value    = currentGoogleUser?.email.toString()
+        photoURL.value = currentGoogleUser?.photoUrl.toString()
     }
-
     // GOOGLE AUTHENTICATION //
 
     // FACEBOOK AUTHENTICATION //
@@ -115,10 +114,11 @@ class LoginViewModel : ViewModel() {
     // FACEBOOK AUTHENTICATION //
 
     fun signOut(activity: Activity) {
-        when(authenticationState) {
+        when(authenticationState.value) {
             AuthenticationState.MANUALLY_AUTHENTICATED -> manuallySignOut()
             AuthenticationState.GOOGLE_AUTHENTICATED   -> googleSignOut(activity)
             AuthenticationState.FACEBOOK_AUTHENTICATED -> facebookSignOut()
         }
+        authenticationState.value = AuthenticationState.UNAUTHENTICATED
     }
 }
