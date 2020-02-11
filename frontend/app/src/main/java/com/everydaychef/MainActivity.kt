@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.findNavController
@@ -52,7 +53,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
         user_image.setOnClickListener(this)
-        updateUI()
+        loginViewModel.setupFacebookSignIn(facebook_sign_in_button)
+        loginViewModel.authenticationState.observe(this, Observer{
+            updateHeaderUI()
+        })
         return true
     }
 
@@ -61,41 +65,35 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun updateUI(){
+    private fun updateHeaderUI(){
+        Log.println(Log.DEBUG, "PRINT", "Updating the header UI!" + loginViewModel.isUserSignedIn())
         if(!loginViewModel.isUserSignedIn()){
             user_name.visibility = View.GONE
             user_email.text = getString(R.string.nav_header_login_first)
-            sign_in_button.setOnClickListener(this)
-            regular_sign_in_button.setOnClickListener(this)
             user_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person))
         } else {
             user_name.visibility = View.VISIBLE
             user_email.text = loginViewModel.email.value
             user_name.text = loginViewModel.username.value
-            if(loginViewModel.photoURL.value != "null"){
-                Glide.with(this).load(loginViewModel.photoURL).into(user_image)
+            loginViewModel.photoURL.value?.let{
+                Glide.with(this).load(it).into(user_image)
             }
         }
     }
 
     fun signOut(item: MenuItem) {
         loginViewModel.signOut(this)
-        updateUI()
     }
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
-            R.id.sign_in_button -> loginViewModel.googleSignIn(this)
             R.id.user_image -> {
+                val navController = findNavController(R.id.nav_host_fragment)
                 if(!loginViewModel.isUserSignedIn()){
-                    loginViewModel.googleSignIn(this)
+                    navController.navigate(R.id.nav_home)
                 } else {
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.nav_profile)
+                    navController.navigate(R.id.nav_profile)
                 }
-            }
-            R.id.regular_sign_in_button -> {
-                val startLoginActivityIntent = Intent(this, LoginActivity::class.java)
-                startActivity(startLoginActivityIntent)
             }
         }
     }
@@ -106,13 +104,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
             val task =
                 GoogleSignIn.getSignedInAccountFromIntent(data)
             handleGoogleSignInResult(task)
+        }else{
+            loginViewModel.facebookCallbackManager.onActivityResult(requestCode, resultCode, data)
         }
     }
 
     private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
         try {
             loginViewModel.googleSignInSuccessfull(completedTask!!.getResult(ApiException::class.java)!!)
-            updateUI()
         } catch (e: ApiException) {
             Log.println(Log.ERROR, "GOOGLE-SIGN-IN", e.printStackTrace().toString())
         }

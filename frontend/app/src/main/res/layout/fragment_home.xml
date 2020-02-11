@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -24,39 +25,38 @@
 
 
     <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button"
-        android:layout_width="152dp"
-        android:layout_height="50dp"
+        android:id="@+id/google_sign_in_button"
+        android:layout_width="151dp"
+        android:layout_height="39dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="60dp"
         android:background="#F44336"
         android:fadingEdge="horizontal|vertical|none"
-        android:onClick="signIn"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/regular_sign_in_button"
-        android:layout_width="88dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="24dp"
-        android:background="@color/colorPrimary"
-        android:fadingEdge="horizontal|vertical|none"
-        android:text="@string/common_signin_button_text"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
-        android:typeface="serif"
-        app:fontFamily="cursive"
-        app:layout_constraintBottom_toTopOf="@+id/sign_in_button"
-        app:layout_constraintEnd_toStartOf="@+id/sign_in_button"
-        app:layout_constraintStart_toStartOf="@+id/sign_in_button" />
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/facebook_sign_in_button"
+        android:layout_width="151dp"
+        android:layout_height="25dp"
+        android:textAlignment="textEnd"
+        android:paddingLeft="21dp"
+        android:paddingRight="25dp"
+        android:paddingStart="21dp"
+        android:paddingEnd="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/google_sign_in_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/google_sign_in_button"
+        app:layout_constraintTop_toBottomOf="@+id/google_sign_in_button"
+        android:gravity="end"
+        />
 
     <Button
         android:id="@+id/register_button"
@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="16dp"
         android:background="@color/colorPrimary"
         android:fadingEdge="horizontal|vertical|none"
         android:text="@string/register"
@@ -72,7 +72,28 @@
         android:textStyle="bold"
         android:typeface="serif"
         app:fontFamily="cursive"
-        app:layout_constraintBottom_toTopOf="@+id/sign_in_button"
-        app:layout_constraintEnd_toEndOf="@+id/sign_in_button"
-        app:layout_constraintStart_toEndOf="@+id/sign_in_button" />
+        app:layout_constraintBottom_toTopOf="@+id/google_sign_in_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/regular_sign_in_button" />
+
+    <Button
+        android:id="@+id/regular_sign_in_button"
+        android:layout_width="88dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/colorPrimary"
+        android:fadingEdge="horizontal|vertical|none"
+        android:text="@string/common_signin_button_text"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:typeface="serif"
+        app:fontFamily="cursive"
+        app:layout_constraintBottom_toTopOf="@+id/google_sign_in_button"
+        app:layout_constraintEnd_toStartOf="@+id/register_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

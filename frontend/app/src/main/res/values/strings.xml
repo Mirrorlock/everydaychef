@@ -23,4 +23,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="menu_profile">Profile</string>
+
+    <string name="facebook_app_id">195155534903437</string>
+    <string name="fb_login_protocol_scheme">fb195155534903437</string>
 </resources>
