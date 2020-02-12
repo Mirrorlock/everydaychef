@@ -6,14 +6,9 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.findNavController
@@ -24,66 +19,44 @@ import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.nav_header_main.*
 
 
 class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOwner {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var userImage: ImageView
-    private lateinit var userName: TextView
-    private lateinit var userEmail: TextView
     private lateinit var loginViewModel: LoginViewModel
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         loginViewModel.setupGoogleSignIn(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
-
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home, R.id.nav_fridge, R.id.nav_cook,
                 R.id.nav_shopping_list, R.id.nav_share, R.id.nav_send, R.id.nav_profile
-            ), drawerLayout
+            ), drawer_layout
         )
-
-        loginViewModel.test.postValue(3)
-
         setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        nav_view.setupWithNavController(navController)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
-        userImage = findViewById(R.id.user_image)
-        userImage.setOnClickListener(this)
-        userName  = findViewById(R.id.user_name)
-        userEmail = findViewById(R.id.user_email)
-        updateUI()
-
+        user_image.setOnClickListener(this)
+        loginViewModel.setupFacebookSignIn(facebook_sign_in_button)
+        loginViewModel.authenticationState.observe(this, Observer{
+            updateHeaderUI()
+        })
         return true
     }
 
@@ -92,71 +65,56 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun updateUI(){
-        val signInButton = findViewById<SignInButton>(R.id.sign_in_button)
-        val regularSignInButton = findViewById<Button>(R.id.regular_sign_in_button)
-        val registerButton = findViewById<Button>(R.id.register_button)
+    private fun updateHeaderUI(){
+        Log.println(Log.DEBUG, "PRINT", "Updating the header UI!" + loginViewModel.isUserSignedIn())
         if(!loginViewModel.isUserSignedIn()){
-            signInButton.visibility = View.VISIBLE
-            regularSignInButton.visibility = View.VISIBLE
-            registerButton.visibility = View.VISIBLE
-            userName.visibility = View.GONE
-            userEmail.text = getString(R.string.nav_header_login_first)
-            signInButton.setOnClickListener(this)
-            userImage.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person))
+            user_name.visibility = View.GONE
+            user_email.text = getString(R.string.nav_header_login_first)
+            user_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person))
         } else {
-            signInButton.visibility = View.GONE
-            regularSignInButton.visibility = View.GONE
-            registerButton.visibility = View.GONE
-            userName.visibility = View.VISIBLE
-            userEmail.text = loginViewModel.email
-            userName.text = loginViewModel.username
-            if(loginViewModel.photoURL != "") {
-                Glide.with(this).load(loginViewModel.photoURL).into(userImage)
+            user_name.visibility = View.VISIBLE
+            user_email.text = loginViewModel.email.value
+            user_name.text = loginViewModel.username.value
+            loginViewModel.photoURL.value?.let{
+                Glide.with(this).load(it).into(user_image)
             }
         }
     }
 
-    fun signOut(Item: MenuItem) {
+    fun signOut(item: MenuItem) {
         loginViewModel.signOut(this)
     }
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
-            R.id.sign_in_button -> loginViewModel.googleSignIn(this)
             R.id.user_image -> {
-                if(loginViewModel.currentGoogleUser === null){
-                    loginViewModel.googleSignIn(this)
+                val navController = findNavController(R.id.nav_host_fragment)
+                if(!loginViewModel.isUserSignedIn()){
+                    navController.navigate(R.id.nav_home)
                 } else {
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.nav_shopping_list)
+                    navController.navigate(R.id.nav_profile)
                 }
             }
         }
     }
 
-    fun signIn(view: View) {
-        loginViewModel.googleSignIn(this)
-    }
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode === loginViewModel.GOOGLE_SIGN_IN) {
+        if (requestCode == loginViewModel.RC_GOOGLE_SIGN_IN) {
             val task =
                 GoogleSignIn.getSignedInAccountFromIntent(data)
             handleGoogleSignInResult(task)
+        }else{
+            loginViewModel.facebookCallbackManager.onActivityResult(requestCode, resultCode, data)
         }
     }
 
     private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
         try {
-            loginViewModel.googleSignInSuccessfull(completedTask!!.getResult(ApiException::class.java)!!)
-//            loginViewModel.authenticationState.s(LoginViewModel.AuthenticationState.GOOGLE_AUTHENTICATED)
-            updateUI()
+            loginViewModel.googleSignInSuccessful(completedTask!!.getResult(ApiException::class.java)!!)
         } catch (e: ApiException) {
             Log.println(Log.ERROR, "GOOGLE-SIGN-IN", e.printStackTrace().toString())
         }
     }
-
 }
 

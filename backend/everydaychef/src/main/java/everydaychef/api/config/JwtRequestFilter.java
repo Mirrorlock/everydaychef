@@ -2,6 +2,7 @@ package everydaychef.api.config;
 
 import everydaychef.api.service.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,6 +51,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 }
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+                    System.out.println(userDetails.toString());
                     if (jwtTokenUtil.validateManualToken(jwtToken, userDetails)) {
                         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());
