@@ -76,11 +76,12 @@ class LoginViewModel : ViewModel() {
     var currentGoogleUser: GoogleSignInAccount? = null
     internal var RC_GOOGLE_SIGN_IN = 7 // Google sign in request code
 
-    fun setupGoogleSignIn(context: Context) {
-        val gso: GoogleSignInOptions =
-            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build()
+
+    fun setupGoogleSignIn(context: Context){
+        val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(context.getString(R.string.google_server_client_id))
+            .requestEmail()
+            .build()
         mGoogleSignInClient = GoogleSignIn.getClient(context, gso)
     }
 
@@ -90,10 +91,11 @@ class LoginViewModel : ViewModel() {
         activity.startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
     }
 
-    fun googleSignInSuccessfull(googleUser: GoogleSignInAccount) {
+    fun googleSignInSuccessful(googleUser: GoogleSignInAccount) {
         currentGoogleUser = googleUser
         fillDataFromGoogleAccount()
         authenticationState.value = AuthenticationState.GOOGLE_AUTHENTICATED
+        Log.println(Log.DEBUG, "PRINT", "Id token is: " + googleUser.idToken)
     }
 
     fun googleSignOut(activity: Activity) {

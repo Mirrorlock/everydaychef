@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
 
     private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
         try {
-            loginViewModel.googleSignInSuccessfull(completedTask!!.getResult(ApiException::class.java)!!)
+            loginViewModel.googleSignInSuccessful(completedTask!!.getResult(ApiException::class.java)!!)
         } catch (e: ApiException) {
             Log.println(Log.ERROR, "GOOGLE-SIGN-IN", e.printStackTrace().toString())
         }
