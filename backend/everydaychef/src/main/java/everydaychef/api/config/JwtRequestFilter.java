@@ -33,22 +33,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         final String requestTokenHeader = request.getHeader("Authorization");
         final String authenticationMethod = request.getHeader("AuthenticationMethod");
         String username = null;
-        String jwtToken = null;
+        String jwtToken;
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-
             jwtToken = requestTokenHeader.substring(7);
-            System.out.println(requestTokenHeader.substring(7));
             if(authenticationMethod != null && authenticationMethod.equals("Google")){
                 jwtTokenUtil.validateGoogleToken(jwtToken);
             }else if(authenticationMethod != null && authenticationMethod.equals("Facebook")){
+                jwtTokenUtil.validateFacebookToken(jwtToken);
             }else{
                 try {
                     username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-
                 } catch (IllegalArgumentException e) {
-                    System.out.println("Unable to get JWT Token");
+                    logger.error("Unable to get JWT Token");
                 } catch (ExpiredJwtException e) {
-                    System.out.println("JWT Token has expired");
+                    logger.error("JWT Token has expired");
                 }
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);

@@ -3,11 +3,13 @@ package everydaychef.api.config;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.LowLevelHttpRequest;
+import com.google.api.client.json.Json;
 import com.google.api.client.json.JsonFactory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import net.minidev.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,15 +42,18 @@ public class JwtToken implements Serializable {
 
     Logger logger = LoggerFactory.getLogger(JwtToken.class);
 
-    @Value("google.validate.token.url")
+    @Value("${google.validate.token.url}")
     private String googleTokenValidationURL;
 
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${google.client.id}")
+    private String googleClientId;
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
+
+    @Value("${jwt.secret}")
+    private String secret;
 
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
@@ -90,10 +95,15 @@ public class JwtToken implements Serializable {
 
     public Boolean validateGoogleToken(String idTokenString) {
         WebClient.RequestHeadersSpec<?> validateTokenRequest = webClient
-                .get().uri(googleTokenValidationURL+idTokenString);
-        String response  = validateTokenRequest.exchange().block().bodyToMono(String.class).block();
-        logger.debug("Returned response from validate google token request is: " + response);
-        return true;
+                .get().uri(googleTokenValidationURL + idTokenString);
+        JSONObject response = validateTokenRequest.exchange().block().bodyToMono(JSONObject.class).block();
+        logger.info("Returned response from validate google token request is: " + response.toJSONString());
+        String audClaim = response.getAsString("aud");
+        System.out.println("Returned aud is: " + audClaim);
+        if (audClaim.equals(googleClientId)) return true;
+        else{
+            return false;
+        }
         //
 //        if (idToken != null) {
 //            Payload payload = idToken.getPayload();
