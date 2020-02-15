@@ -17,6 +17,9 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
+import com.everydaychef.auth.LoginViewModel
+import com.everydaychef.helpers.PopupService
+import com.everydaychef.ui.settings.SettingsActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
@@ -31,10 +34,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var loginViewModel: LoginViewModel
+    private lateinit var popupService: PopupService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         loginViewModel.setupGoogleSignIn(this)
+        popupService = PopupService(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
@@ -65,6 +70,49 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
+    override fun onClick(p0: View?) {
+        when (p0?.id) {
+            R.id.user_image -> {
+                val navController = findNavController(R.id.nav_host_fragment)
+                if(!loginViewModel.isUserSignedIn()){
+                    navController.navigate(R.id.nav_home)
+                    popupService.displayShortTop("Log in first!")
+                } else {
+                    navController.navigate(R.id.nav_profile)
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            loginViewModel.RC_GOOGLE_SIGN_IN   -> {
+                val task =
+                    GoogleSignIn.getSignedInAccountFromIntent(data)
+                handleGoogleSignInResult(task)
+                popupService.displayShortTop("Successfully logged in as: " + loginViewModel.email.value)
+            }
+            loginViewModel.RC_FACEBOOK_SIGN_IN -> {
+                loginViewModel.facebookCallbackManager.onActivityResult(requestCode, resultCode, data)
+                popupService.displayShortTop("Successfully logged in as: " + loginViewModel.email.value)
+            }
+        }
+    }
+
+    private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
+        try {
+            loginViewModel.googleSignInSuccessful(completedTask!!.getResult(ApiException::class.java)!!)
+        } catch (e: ApiException) {
+            Log.println(Log.ERROR, "GOOGLE-SIGN-IN", e.printStackTrace().toString())
+        }
+    }
+
+    fun signOut(item: MenuItem) {
+        loginViewModel.signOut(this)
+        popupService.displayShortDefault("Successfully signed out!")
+    }
+
     private fun updateHeaderUI(){
         Log.println(Log.DEBUG, "PRINT", "Updating the header UI!" + loginViewModel.isUserSignedIn())
         if(!loginViewModel.isUserSignedIn()){
@@ -78,43 +126,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
             loginViewModel.photoURL.value?.let{
                 Glide.with(this).load(it).into(user_image)
             }
+            popupService.displayShortTop("Logged in as: " + user_name.text)
         }
     }
 
-    fun signOut(item: MenuItem) {
-        loginViewModel.signOut(this)
+    fun showSettings(item: MenuItem) {
+        intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
     }
 
-    override fun onClick(p0: View?) {
-        when (p0?.id) {
-            R.id.user_image -> {
-                val navController = findNavController(R.id.nav_host_fragment)
-                if(!loginViewModel.isUserSignedIn()){
-                    navController.navigate(R.id.nav_home)
-                } else {
-                    navController.navigate(R.id.nav_profile)
-                }
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == loginViewModel.RC_GOOGLE_SIGN_IN) {
-            val task =
-                GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleGoogleSignInResult(task)
-        }else{
-            loginViewModel.facebookCallbackManager.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
-        try {
-            loginViewModel.googleSignInSuccessful(completedTask!!.getResult(ApiException::class.java)!!)
-        } catch (e: ApiException) {
-            Log.println(Log.ERROR, "GOOGLE-SIGN-IN", e.printStackTrace().toString())
-        }
-    }
 }
 

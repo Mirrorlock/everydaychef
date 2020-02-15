@@ -1,15 +1,14 @@
-package com.everydaychef
+package com.everydaychef.auth
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.everydaychef.R
 import com.facebook.*
-import com.facebook.login.LoginFragment
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
@@ -35,7 +34,8 @@ class LoginViewModel : ViewModel() {
     var photoURL = MutableLiveData<String>()
 
     init {
-        authenticationState.value = AuthenticationState.UNAUTHENTICATED
+        authenticationState.value =
+            AuthenticationState.UNAUTHENTICATED
         username.value = ""
         email.value = ""
         photoURL.value = ""
@@ -47,16 +47,19 @@ class LoginViewModel : ViewModel() {
     }
 
     fun refuseAuthentication() {
-        authenticationState.value = AuthenticationState.UNAUTHENTICATED
+        authenticationState.value =
+            AuthenticationState.UNAUTHENTICATED
     }
 
     // MANUAL AUTHENTICATION //
     fun authenticate(username: String, password: String) {
         if (passwordIsValidForUsername(username, password)) {
             this.username.value = username
-            authenticationState.value = AuthenticationState.MANUALLY_AUTHENTICATED
+            authenticationState.value =
+                AuthenticationState.MANUALLY_AUTHENTICATED
         } else {
-            authenticationState.value = AuthenticationState.INVALID_AUTHENTICATION
+            authenticationState.value =
+                AuthenticationState.INVALID_AUTHENTICATION
         }
     }
 
@@ -94,7 +97,8 @@ class LoginViewModel : ViewModel() {
     fun googleSignInSuccessful(googleUser: GoogleSignInAccount) {
         currentGoogleUser = googleUser
         fillDataFromGoogleAccount()
-        authenticationState.value = AuthenticationState.GOOGLE_AUTHENTICATED
+        authenticationState.value =
+            AuthenticationState.GOOGLE_AUTHENTICATED
         Log.println(Log.DEBUG, "PRINT", "Id token is: " + googleUser.idToken)
     }
 
@@ -114,6 +118,7 @@ class LoginViewModel : ViewModel() {
 
     // FACEBOOK AUTHENTICATION //
     internal val facebookCallbackManager = CallbackManager.Factory.create()
+    internal val RC_FACEBOOK_SIGN_IN = 64206
 
     fun setupFacebookSignIn(button: LoginButton) {
         val accessToken: AccessToken? = AccessToken.getCurrentAccessToken()
@@ -122,27 +127,30 @@ class LoginViewModel : ViewModel() {
         else {
             Log.println(Log.DEBUG, "PRINT", "in the setup")
             button.setPermissions("public_profile", "user_status", "email")
-            button.registerCallback(facebookCallbackManager, object : FacebookCallback<LoginResult?> {
-                override fun onSuccess(loginResult: LoginResult?) { // App code
-                    Log.println(Log.INFO, "FACEBOOK-AUTH", "Facebook auth successful!")
-                    loginResult?.accessToken?.let { fillDataFromFacebookAccount(it) }
-                }
-
-                override fun onCancel() { // App code
-                    Log.println(Log.INFO, "FACEBOOK-AUTH", "Facebook auth canceled!")
-                }
-
-                override fun onError(exception: FacebookException) { // App code
-                    Log.println(
-                        Log.ERROR,
-                        "FACEBOOK-AUTH",
-                        "Error from facebook auth: " + exception.stackTrace.toString() + " " + exception.localizedMessage
-                    )
-                }
-            })
+            facebookRegisterButtonCallback(button)
         }
     }
 
+    fun facebookRegisterButtonCallback(button: LoginButton){
+        button.registerCallback(facebookCallbackManager, object : FacebookCallback<LoginResult?> {
+            override fun onSuccess(loginResult: LoginResult?) { // App code
+                Log.println(Log.INFO, "FACEBOOK-AUTH", "Facebook auth successful!")
+                loginResult?.accessToken?.let { fillDataFromFacebookAccount(it) }
+            }
+
+            override fun onCancel() { // App code
+                Log.println(Log.INFO, "FACEBOOK-AUTH", "Facebook auth canceled!")
+            }
+
+            override fun onError(exception: FacebookException) { // App code
+                Log.println(
+                    Log.ERROR,
+                    "FACEBOOK-AUTH",
+                    "Error from facebook auth: " + exception.stackTrace.toString() + " " + exception.localizedMessage
+                )
+            }
+        })
+    }
     private fun fillDataFromFacebookAccount(accessToken: AccessToken) {
         val request = GraphRequest.newMeRequest(accessToken) { `object`, response ->
             try {
@@ -154,7 +162,8 @@ class LoginViewModel : ViewModel() {
                 this.username.value = name
                 this.email.value    = email
                 this.photoURL.value = image
-                authenticationState.value = AuthenticationState.FACEBOOK_AUTHENTICATED
+                authenticationState.value =
+                    AuthenticationState.FACEBOOK_AUTHENTICATED
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
@@ -178,6 +187,7 @@ class LoginViewModel : ViewModel() {
             AuthenticationState.GOOGLE_AUTHENTICATED -> googleSignOut(activity)
             AuthenticationState.FACEBOOK_AUTHENTICATED -> facebookSignOut()
         }
-        authenticationState.value = AuthenticationState.UNAUTHENTICATED
+        authenticationState.value =
+            AuthenticationState.UNAUTHENTICATED
     }
 }

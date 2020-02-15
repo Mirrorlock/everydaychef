@@ -3,4 +3,8 @@
     <color name="colorPrimary">@android:color/holo_green_light</color>
     <color name="colorPrimaryDark">#78a100</color>
     <color name="colorAccent">#F5F55892</color>
+    <color name="profileGradEnd">#5599CC00</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="red">#FF0000</color>
 </resources>

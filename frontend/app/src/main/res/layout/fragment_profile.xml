@@ -1,13 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.profile.ProfileFragment">
+    <RelativeLayout
+        android:id="@+id/profile_header"
+        android:layout_width="match_parent"
+        android:layout_height="200sp"
+        android:background="@drawable/gradient_profile">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_centerVertical="true">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/profile_pic"
+                    android:layout_width="140sp"
+                    android:layout_height="160sp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/vector_food_background" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true">
+
+                    <TextView
+                        android:id="@+id/profile_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Person Test"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="35sp"
+                        android:textStyle="bold"
+                        android:typeface="serif"
+                        app:fontFamily="cursive" />
+
+                    <TextView
+                        android:id="@+id/profile_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/profile_name"
+                        android:textSize="20sp"
+                        android:textColor="@color/white"
+                        android:typeface="serif"
+                        app:fontFamily="cursive"
+                        android:textAlignment="center"
+                        android:text="test.text@test.com" />
+                </RelativeLayout>
+            </RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/profile_family_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_alignBaseline="@id/profile_family_name"
+        android:typeface="serif"
+        app:fontFamily="cursive"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:textColor="@color/colorAccent"
+        android:text="Family: "/>
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/profile_family_members_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/profile_family_tag"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:text="Members: "
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="30sp"
+        android:typeface="serif"
+        app:fontFamily="cursive" />
+
+    <TextView
+        android:id="@+id/profile_family_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/profile_family_tag"
+        android:layout_toEndOf="@id/profile_family_tag"
+        android:layout_below="@id/profile_header"
+        android:text="Simens"
+        android:textColor="@color/colorAccent"
+        android:textSize="50sp"
+        android:textAlignment="center"/>
+
+    <ScrollView
+        android:id="@+id/profile_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/profile_family_members_tag">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_profile_family_member1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="cursive"
+                android:textColor="@color/colorAccent"
+                android:text="Veronika"
+                android:textSize="@dimen/big_text"
+                android:textStyle="bold"
+                android:textAlignment="center"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/profile_family_actions_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/profile_family_actions_layout"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:text="Actions: "
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="30sp"
+        android:typeface="serif"
+        app:fontFamily="cursive" />
+
+    <LinearLayout
+        android:id="@+id/profile_family_actions_layout"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="36dp"
+        android:orientation="vertical">
+        <Button
+            android:layout_width="200dp"
+            android:layout_height="70dp"
+            android:background="@color/red"
+            android:textColor="@color/white"
+            android:text="Leave Family"/>
+
+
+    </LinearLayout>
+<!--    <GridView-->
+<!--        android:id="@+id/profile_family_members_grid"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:gravity="center"-->
+<!--        android:columnWidth="100dp"-->
+<!--        android:numColumns="auto_fit"-->
+<!--        android:verticalSpacing="24dp"-->
+<!--        android:horizontalSpacing="10dp"-->
+<!--        android:stretchMode="spacingWidthUniform"/>-->
+
+</RelativeLayout>
