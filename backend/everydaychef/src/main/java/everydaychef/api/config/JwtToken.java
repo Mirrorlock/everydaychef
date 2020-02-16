@@ -45,15 +45,12 @@ public class JwtToken implements Serializable {
     @Value("${google.validate.token.url}")
     private String googleTokenValidationURL;
 
-    @Value("${google.client.id}")
-    private String googleClientId;
+    @Value("${jwt.secret}")
+    private String secret;
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
-
-    @Value("${jwt.secret}")
-    private String secret;
 
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
@@ -84,6 +81,10 @@ public class JwtToken implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
+    public Boolean validateToken(String jwtToken, String authenticationMethod){
+
+        return false;
+    }
     public Boolean validateFacebookToken(String token) {
         return false;
     }
@@ -93,17 +94,20 @@ public class JwtToken implements Serializable {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public Boolean validateGoogleToken(String idTokenString) {
-        WebClient.RequestHeadersSpec<?> validateTokenRequest = webClient
-                .get().uri(googleTokenValidationURL + idTokenString);
-        JSONObject response = validateTokenRequest.exchange().block().bodyToMono(JSONObject.class).block();
-        logger.info("Returned response from validate google token request is: " + response.toJSONString());
-        String audClaim = response.getAsString("aud");
-        System.out.println("Returned aud is: " + audClaim);
-        if (audClaim.equals(googleClientId)) return true;
-        else{
-            return false;
-        }
+    public JSONObject validateGoogleTokenResponse(String idTokenString) {
+        return webClient.get()
+                .uri(googleTokenValidationURL + idTokenString)
+                .exchange()
+                .block()
+                .bodyToMono(JSONObject.class)
+                .block();
+//        logger.info("Returned response from validate google token request is: " + response.toJSONString());
+//        String audClaim = response.getAsString("aud");
+//        System.out.println("Returned aud is: " + audClaim);
+//        if (audClaim.equals(googleClientId)) return true;
+//        else{
+//            return false;
+//        }
         //
 //        if (idToken != null) {
 //            Payload payload = idToken.getPayload();

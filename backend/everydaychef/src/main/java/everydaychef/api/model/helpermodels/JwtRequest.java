@@ -1,4 +1,4 @@
-package everydaychef.api.model;
+package everydaychef.api.model.helpermodels;
 
 import java.io.Serializable;
 
