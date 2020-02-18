@@ -1,0 +1,47 @@
+package com.everydaychef.main.ui.home
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.everydaychef.R
+import com.everydaychef.auth.AuthViewModel
+
+class HomeFragment : Fragment(), View.OnClickListener {
+
+    private var homeViewModel: TempViewModel? = null
+//    private var loginViewModel: AuthViewModel? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val root = inflater.inflate(R.layout.fragment_home, container, false)
+        return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        activity?.let{
+//            loginViewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
+//            loginViewModel?.authenticationState?.observe(this, Observer {
+//                updateHomeUI()
+//            })
+        }
+    }
+
+    override fun onClick(p0: View?) {
+        when(p0?.id){
+//            R.id/**/.google_sign_in_button -> activity?.let { loginViewModel?.googleSignIn(it) }
+//            R.id.regular_sign_in_button -> {
+//                activity?.let {
+//                    val startLoginActivityIntent = Intent(activity, LoginActivity::class.java)
+//                        startActivity(startLoginActivityIntent)
+//                }
+//            }
+        }
+    }
+
+}

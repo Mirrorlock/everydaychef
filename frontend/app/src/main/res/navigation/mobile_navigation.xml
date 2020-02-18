@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.everydaychef.ui.home.HomeFragment"
+        android:name="com.everydaychef.main.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -19,37 +19,37 @@
 
     <fragment
         android:id="@+id/nav_fridge"
-        android:name="com.everydaychef.ui.fridge.FridgeFragment"
+        android:name="com.everydaychef.main.ui.fridge.FridgeFragment"
         android:label="@string/menu_fridge"
         tools:layout="@layout/fragment_fridge" />
 
     <fragment
         android:id="@+id/nav_cook"
-        android:name="com.everydaychef.ui.slideshow.SlideshowFragment"
+        android:name="com.everydaychef.main.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_cook"
         tools:layout="@layout/fragment_cook" />
 
     <fragment
         android:id="@+id/nav_shopping_list"
-        android:name="com.everydaychef.ui.tools.ToolsFragment"
+        android:name="com.everydaychef.main.ui.tools.ToolsFragment"
         android:label="@string/menu_shopping_list"
         tools:layout="@layout/fragment_shopping_list" />
 
     <fragment
         android:id="@+id/nav_share"
-        android:name="com.everydaychef.ui.share.ShareFragment"
+        android:name="com.everydaychef.main.ui.share.ShareFragment"
         android:label="@string/menu_share"
         tools:layout="@layout/fragment_share" />
 
     <fragment
         android:id="@+id/nav_send"
-        android:name="com.everydaychef.ui.send.SendFragment"
+        android:name="com.everydaychef.main.ui.send.SendFragment"
         android:label="@string/menu_send"
         tools:layout="@layout/fragment_send" />
 
     <fragment
         android:id="@+id/nav_profile"
-        android:name="com.everydaychef.ui.profile.ProfileFragment"
+        android:name="com.everydaychef.main.ui.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
 </navigation>
