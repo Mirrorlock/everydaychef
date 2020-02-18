@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
     }
 
     private fun startLoginActivity() {
+
         startActivity(Intent(this, LoginActivity::class.java))
     }
 
@@ -99,8 +100,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
     }
 
     fun signOut(item: MenuItem) {
-//        authViewModel.signOut(this)
+        authViewModel.signOut()
         popupUtility.displayShortDefault("Successfully signed out!")
+        startLoginActivity()
     }
 
     private fun updateHeaderUI(){

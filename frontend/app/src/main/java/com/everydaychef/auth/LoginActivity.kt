@@ -31,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
         authViewModel.setupFacebookSignIn(facebook_sign_in_button)
         authViewModel.setupGoogleSignIn(this, google_sign_in_button)
         authViewModel.currentUser.observe(this, Observer{
+            Log.println(Log.DEBUG, "PRINT", "Changed current user!")
             if(authViewModel.isUserSignedIn())
                 startMainActivity()
         })
@@ -43,12 +44,14 @@ class LoginActivity : AppCompatActivity() {
                 val task =
                     GoogleSignIn.getSignedInAccountFromIntent(data)
                 handleGoogleSignInResult(task)
-                startMainActivity()
+//                startMainActivity()
 //                popupUtility.displayShortTop("Successfully logged in as: " + authViewModel.email.value)
             }
             authViewModel.RC_FACEBOOK_SIGN_IN -> {
                 authViewModel.facebookCallbackManager
                     .onActivityResult(requestCode, resultCode, data)
+//                startMainActivity()
+
 //                popupUtility.displayShortTop("Successfully logged in as: " + authViewModel.email.value)
             }
         }

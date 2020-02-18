@@ -41,19 +41,13 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
             userRepository.setUserSignedInMethod("invalid")
         }
     }
-
-
-    fun manuallySignOut() {
-        TODO("not implemented")
-    }
-
     // MANUAL AUTHENTICATION //
 
 
     /// GOOGLE AUTHENTICATION ///
-    internal lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
     var currentGoogleUser: GoogleSignInAccount? = null
-    internal var RC_GOOGLE_SIGN_IN = 7 // Google sign in request code
+    var RC_GOOGLE_SIGN_IN = 7 // Google sign in request code
 
     fun setupGoogleSignIn(context: Context, listener: SignInButton){
         val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -61,6 +55,7 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
             .requestEmail()
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(context, gso)
+        userRepository.setGoogleClient(mGoogleSignInClient)
         listener.setOnClickListener{googleSignIn(context as Activity)}
     }
 
@@ -76,14 +71,10 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
         Log.println(Log.DEBUG, "PRINT", "Id token is: " + googleUser.idToken)
     }
 
-//    fun googleSignOut() {
-//        mGoogleSignInClient.signOut()
-//    }
-
     fun fillDataFromGoogleAccount() {
         Log.println(Log.DEBUG, "PRINT", "We are here!")
         userRepository.setCurrentUser(currentGoogleUser)
-//        userRepository.setUserSignedInMethod("google")
+        userRepository.setUserSignedInMethod("google")
 //        username.value = currentGoogleUser?.displayName.toString()
 //        email.value = currentGoogleUser?.email.toString()
 //        photoURL.value = currentGoogleUser?.photoUrl.toString()
@@ -91,21 +82,23 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
     // GOOGLE AUTHENTICATION //
 
     // FACEBOOK AUTHENTICATION //
-    internal val facebookCallbackManager = CallbackManager.Factory.create()
-    internal val RC_FACEBOOK_SIGN_IN = 64206
+    val facebookCallbackManager = CallbackManager.Factory.create()
+    val RC_FACEBOOK_SIGN_IN = 64206
 
     fun setupFacebookSignIn(button: LoginButton) {
-        val accessToken: AccessToken? = AccessToken.getCurrentAccessToken()
-        if (accessToken != null)
+        /*val accessToken: AccessToken? = AccessToken.getCurrentAccessToken()
+        if (accessToken != null) {
+            Log.println(Log.DEBUG, "PRINT", "Found access token!")
             fillDataFromFacebookAccount(accessToken)
+        }
         else {
-            Log.println(Log.DEBUG, "PRINT", "in the setup")
+        */
             button.setPermissions("public_profile", "user_status", "email")
             facebookRegisterButtonCallback(button)
-        }
+//        }
     }
 
-    fun facebookRegisterButtonCallback(button: LoginButton){
+    private fun facebookRegisterButtonCallback(button: LoginButton){
         button.registerCallback(facebookCallbackManager, object : FacebookCallback<LoginResult?> {
             override fun onSuccess(loginResult: LoginResult?) { // App code
                 Log.println(Log.INFO, "FACEBOOK-AUTH", "Facebook auth successful!")
@@ -125,21 +118,17 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
             }
         })
     }
+
     private fun fillDataFromFacebookAccount(accessToken: AccessToken) {
-        val request = GraphRequest.newMeRequest(accessToken) { `object`, response ->
+        val request = GraphRequest.newMeRequest(accessToken) { `object`, _ ->
             try {
                 val name = `object`.getString("name")
                 val email = `object`.getString("email")
                 val image =
                     `object`.getJSONObject("picture").getJSONObject("data").getString("url")
                 Log.println(Log.DEBUG, "PRINT", "$name with $email and imageURL: $image")
-//                userRepository.setCurrentUser(name, email, image)
-//                userRepository.setUserSignedInMethod("facebook")
-//                this.username.value = name
-//                this.email.value    = email
-//                this.photoURL.value = image
-//                authenticationState.value =
-//                    AuthenticationState.FACEBOOK_AUTHENTICATED
+                userRepository.setCurrentUser(name, email, image, accessToken.token)
+                userRepository.setUserSignedInMethod("facebook")
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
@@ -150,21 +139,10 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
         request.parameters = parameters
         request.executeAsync()
     }
-//
-//    private fun facebookSignOut() {
-//        LoginManager.getInstance().logOut()
-//    }
-
     // FACEBOOK AUTHENTICATION //
 
-//    fun signOut(activity: Activity) {
-//        when (authenticationState.value) {
-//            AuthenticationState.MANUALLY_AUTHENTICATED -> manuallySignOut()
-//            AuthenticationState.GOOGLE_AUTHENTICATED -> googleSignOut(activity)
-//            AuthenticationState.FACEBOOK_AUTHENTICATED -> facebookSignOut()
-//        }
-//        authenticationState.value =
-//            AuthenticationState.UNAUTHENTICATED
-//    }
+    fun signOut() {
+        userRepository.signOut()
+    }
 }
 

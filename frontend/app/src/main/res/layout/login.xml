@@ -11,7 +11,7 @@
         android:id="@+id/facebook_sign_in_button"
         android:layout_width="151dp"
         android:layout_height="25dp"
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="50dp"
         android:gravity="end"
         android:paddingStart="21dp"
         android:paddingLeft="21dp"
@@ -33,7 +33,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="48dp"
         android:background="#F44336"
         android:fadingEdge="horizontal|vertical|none"
         android:textAlignment="center"
@@ -121,7 +121,7 @@
         android:layout_height="44dp"
         android:layout_marginBottom="12dp"
         android:background="@android:color/holo_red_light"
-        android:text="Register Me!"
+        android:text="Register"
         android:fadingEdge="horizontal|vertical|none"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
@@ -131,5 +131,19 @@
         app:layout_constraintBottom_toTopOf="@+id/login_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_or"
+        android:layout_width="296dp"
+        android:layout_height="19dp"
+        android:fontFamily="cursive"
+        android:text="───────  OR  ───────"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/register_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/facebook_sign_in_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
