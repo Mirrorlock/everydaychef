@@ -1,17 +1,18 @@
-package com.everydaychef.auth
+package com.everydaychef
 
+import com.everydaychef.auth.UserService
 import dagger.Module
 import dagger.Provides
-import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.http.GET
+import retrofit2.converter.gson.GsonConverterFactory
 
 @Module
 class NetworkModule{
     @Provides
-    fun provideRetrofitService(): UserService{
+    fun provideRetrofitService(): UserService {
         return Retrofit.Builder()
-            .baseUrl("something")
+            .baseUrl("http://192.168.1.15/")
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(UserService::class.java)
     }

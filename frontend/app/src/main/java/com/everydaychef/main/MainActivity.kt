@@ -9,6 +9,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -33,24 +34,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var popupUtility: PopupUtility
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (application as EverydayChefApplication).appComponent.inject(this)
-        popupUtility = PopupUtility(this)
         super.onCreate(savedInstanceState)
+        popupUtility = PopupUtility(this)
         setContentView(R.layout.activity_main)
+        navController = findNavController(R.id.nav_host_fragment)
+        (application as EverydayChefApplication).appComponent.inject(this)
 
-        // SIGN-IN //
-        if(!authViewModel.isUserSignedIn()){
-            Log.println(Log.DEBUG, "PRINT", "User not signed in, starting activity!")
-            startLoginActivity()
-        }
-        // SIGN-IN //
-
-
-        // drawer initialisation //
+        // DRAWER INITIALISATION //
         setSupportActionBar(toolbar)
-        val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
@@ -64,36 +58,39 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
-        // drawer initialisation //
-    }
-
-    private fun startLoginActivity() {
-
-        startActivity(Intent(this, LoginActivity::class.java))
+        // DRAWER INITIALISATION //
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
-        authViewModel.currentUser.observe(this, Observer{
-            if(authViewModel.isUserSignedIn()){
-                    popupUtility.displayLongTop("Logged in as: " + it.email)
-                updateHeaderUI()
-            }
-        })
+        authenticateUser()
         user_image.setOnClickListener(this)
         return true
     }
 
+    private fun authenticateUser(){
+        authViewModel.currentUser.observe(this, Observer{
+            if (!authViewModel.isUserSignedIn()) {
+                goToLogin()
+            } else {
+                popupUtility.displayLongDefault("Logged in as: " + it.email)
+                updateHeaderUI()
+            }
+        })
+    }
+
+    private fun goToLogin() {
+        navController.navigate(R.id.action_nav_home_to_nav_login)
+    }
+
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.user_image -> {
-                val navController = findNavController(R.id.nav_host_fragment)
                 navController.navigate(R.id.nav_profile)
             }
         }
@@ -102,7 +99,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
     fun signOut(item: MenuItem) {
         authViewModel.signOut()
         popupUtility.displayShortDefault("Successfully signed out!")
-        startLoginActivity()
+        goToLogin()
     }
 
     private fun updateHeaderUI(){

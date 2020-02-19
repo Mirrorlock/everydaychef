@@ -8,11 +8,14 @@ import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import retrofit2.Call
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
+import javax.security.auth.callback.Callback
 
 @Singleton
-class UserRepository @Inject constructor (/*private val userService: UserService*/){
+class UserRepository @Inject constructor (private val userService: UserService){
     var currentUser = MutableLiveData<CurrentUser>()
         private set
 
@@ -21,37 +24,25 @@ class UserRepository @Inject constructor (/*private val userService: UserService
     val userSignedIn: Boolean
         get() = currentUser.value != null
 
-    var signInMethod: AuthenticationMethod = AuthenticationMethod.UNAUTHENTICATED
+    var authenticationState = MutableLiveData<AuthenticationState>()
 //        set(value) = setUserSignedInMethod(value.toString())
 
     init{
         currentUser.value = null
+        authenticationState.value = AuthenticationState.UNAUTHENTICATED
     }
 
-    enum class AuthenticationMethod {
-        UNAUTHENTICATED,        // Initial state, the user needs to authenticate
-        MANUALLY_AUTHENTICATED, // The user has authenticated successfully
-        GOOGLE_AUTHENTICATED,   // The user has authenticated via google successfully
-        FACEBOOK_AUTHENTICATED, // The user has authenticated via facebook successfully
-        INVALID_AUTHENTICATION  // Authentication failed
-    }
-
-
-    fun setUserSignedInMethod(method: String){
-        if(method == "facebook"){
-            signInMethod = AuthenticationMethod.FACEBOOK_AUTHENTICATED
-        }else if(method == "google"){
-            signInMethod = AuthenticationMethod.GOOGLE_AUTHENTICATED
-        }else if(method == "invalid"){
-            signInMethod = AuthenticationMethod.INVALID_AUTHENTICATION
-        } else {
-            signInMethod = AuthenticationMethod.MANUALLY_AUTHENTICATED
+    fun setUserAuthenticationState(method: String){
+        when (method) {
+            "facebook" -> authenticationState.value = AuthenticationState.FACEBOOK_AUTHENTICATED
+            "google" -> authenticationState.value = AuthenticationState.GOOGLE_AUTHENTICATED
+            "invalid" -> authenticationState.value = AuthenticationState.INVALID_AUTHENTICATION
+            else -> authenticationState.value = AuthenticationState.MANUALLY_AUTHENTICATED
         }
     }
 
     fun setCurrentUser(username: String){
         currentUser.value?.username = username //temp
-//        userService.getUserByUsername(username)
     }
 
     fun setCurrentUser(username: String, email: String, photoUrl: String, accessToken: String){
@@ -61,9 +52,29 @@ class UserRepository @Inject constructor (/*private val userService: UserService
         currentUser.value?.email = email
         currentUser.value?.photoUrl = photoUrl
         currentUser.value?.token = accessToken
+        userService.getUsers().enqueue(object : retrofit2.Callback<List<User>>{
+            override fun onFailure(call: Call<List<User>>?, t: Throwable?) {
+                Log.println(Log.DEBUG, "PRINT", "There was an error with retrieving users!")
+            }
+
+            override fun onResponse(call: Call<List<User>>?, response: Response<List<User>>?) {
+                Log.println(Log.DEBUG, "PRINT", "We got response: " + response?.body())
+            }
+
+        })
     }
 
     fun setCurrentUser(currentGoogleUser: GoogleSignInAccount?){
+        userService.getUsers().enqueue(object : retrofit2.Callback<List<User>>{
+            override fun onFailure(call: Call<List<User>>?, t: Throwable?) {
+                Log.println(Log.DEBUG, "PRINT", "There was an error with retrieving users: " + t.toString())
+            }
+
+            override fun onResponse(call: Call<List<User>>?, response: Response<List<User>>?) {
+                Log.println(Log.DEBUG, "PRINT", "We got response: " + response?.body())
+            }
+
+        })
         currentUser.value = CurrentUser()
         Log.println(Log.DEBUG, "PRINT", "Setting google user!")
         currentUser.value?.username = currentGoogleUser?.displayName.toString()
@@ -86,18 +97,19 @@ class UserRepository @Inject constructor (/*private val userService: UserService
 
 
     fun signOut() {
-        when(signInMethod){
-            AuthenticationMethod.MANUALLY_AUTHENTICATED -> manuallySignOut()
-            AuthenticationMethod.GOOGLE_AUTHENTICATED -> googleSignOut()
-            AuthenticationMethod.FACEBOOK_AUTHENTICATED -> facebookSignOut()
+        when(authenticationState.value){
+            AuthenticationState.MANUALLY_AUTHENTICATED -> manuallySignOut()
+            AuthenticationState.GOOGLE_AUTHENTICATED -> googleSignOut()
+            AuthenticationState.FACEBOOK_AUTHENTICATED -> facebookSignOut()
         }
         currentUser.value = null
-        signInMethod = AuthenticationMethod.UNAUTHENTICATED
+        authenticationState.value = AuthenticationState.UNAUTHENTICATED
 
     }
 
     private fun manuallySignOut() {
-        TODO("not implemented")
+        //TODO("not implemented")
+
     }
 
     fun googleSignOut() {

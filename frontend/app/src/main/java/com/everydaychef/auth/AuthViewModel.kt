@@ -23,10 +23,10 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
 //    var  tempRepository: TempRepository
     val currentUser = userRepository.currentUser
+    val authenticationState: MutableLiveData<AuthenticationState>
+            = userRepository.authenticationState
 //
     fun isUserSignedIn(): Boolean {
-        Log.println(Log.DEBUG, "PRINT" , "Is user signed in: " + userRepository.userSignedIn)
-        Log.println(Log.DEBUG, "PRINT", currentUser.value.toString())
         return userRepository.userSignedIn
     }
 
@@ -36,9 +36,9 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
     fun manuallySignIn(username: String, password: String) {
         if (userRepository.passwordIsValidForUsername(username, password)) {
             userRepository.setCurrentUser(username)
-            userRepository.setUserSignedInMethod("manual")
+            userRepository.setUserAuthenticationState("manual")
         } else {
-            userRepository.setUserSignedInMethod("invalid")
+            userRepository.setUserAuthenticationState("invalid")
         }
     }
     // MANUAL AUTHENTICATION //
@@ -74,10 +74,7 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
     fun fillDataFromGoogleAccount() {
         Log.println(Log.DEBUG, "PRINT", "We are here!")
         userRepository.setCurrentUser(currentGoogleUser)
-        userRepository.setUserSignedInMethod("google")
-//        username.value = currentGoogleUser?.displayName.toString()
-//        email.value = currentGoogleUser?.email.toString()
-//        photoURL.value = currentGoogleUser?.photoUrl.toString()
+        userRepository.setUserAuthenticationState("google")
     }
     // GOOGLE AUTHENTICATION //
 
@@ -93,8 +90,9 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
         }
         else {
         */
-            button.setPermissions("public_profile", "user_status", "email")
-            facebookRegisterButtonCallback(button)
+        LoginManager.getInstance().logOut()
+        button.setPermissions("public_profile", "user_status", "email")
+        facebookRegisterButtonCallback(button)
 //        }
     }
 
@@ -128,7 +126,7 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
                     `object`.getJSONObject("picture").getJSONObject("data").getString("url")
                 Log.println(Log.DEBUG, "PRINT", "$name with $email and imageURL: $image")
                 userRepository.setCurrentUser(name, email, image, accessToken.token)
-                userRepository.setUserSignedInMethod("facebook")
+                userRepository.setUserAuthenticationState("facebook")
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
@@ -143,6 +141,10 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
 
     fun signOut() {
         userRepository.signOut()
+    }
+
+    fun refuseAuthentiation() {
+        userRepository.setUserAuthenticationState("invalid")
     }
 }
 
