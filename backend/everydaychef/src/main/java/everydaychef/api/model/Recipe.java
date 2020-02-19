@@ -1,5 +1,8 @@
 package everydaychef.api.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -16,12 +19,16 @@ public class Recipe {
     private int number_of_likes;
 
     @ManyToOne
+    @JsonBackReference
     private User creator;
 
     @ManyToMany
+    @JsonBackReference
     private Set<User> likes;
 
     @ManyToMany
+    @JoinTable(name="recipe_ingredients", inverseJoinColumns = @JoinColumn(name="ingredient_id"))
+    @JsonBackReference
     private Set<Ingredient> ingredients;
 
     public int getId() {

@@ -1,22 +1,17 @@
 package everydaychef.api.controller;
 
-import com.sun.net.httpserver.HttpsConfigurator;
 import everydaychef.api.exceptions.ValidationException;
 import everydaychef.api.model.Family;
 import everydaychef.api.model.User;
 import everydaychef.api.repository.FamilyRepository;
 import everydaychef.api.repository.UserRepository;
-import javassist.NotFoundException;
-import org.apache.catalina.connector.Response;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class UserController {
@@ -34,7 +29,7 @@ public class UserController {
         return userRepository.findById(Integer.parseInt(Id));
     }
 
-    @GetMapping("/users")
+    @GetMapping("/user")
     public ResponseEntity<List<User>> getUser() throws NoSuchElementException {
         return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
     }
@@ -50,14 +45,19 @@ public class UserController {
                 .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
-
     @GetMapping("/user/{userId}/family")
-    public ResponseEntity<Family> getUserFamily(@PathVariable String userId) throws NotFoundException {
-        int Id = Integer.parseInt(userId);
-
-        return userRepository.findById(Id)
+    public ResponseEntity<Family> getUserFamily(@PathVariable String userId){
+        int userIdNum = Integer.parseInt(userId);
+        return userRepository.findById(userIdNum)
                 .map(user -> new ResponseEntity<>(user.getFamily(), HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+                .orElse(new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/user/{userId}/invitations")
+    public ResponseEntity<Set<Family>> getInvitations(@PathVariable String userId) {
+        return getUserById(userId)
+                .map(user -> new ResponseEntity<>(user.getInvitations(), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(null, new HttpHeaders(), HttpStatus.NOT_FOUND));
     }
 
     @PostMapping("/user")
@@ -92,11 +92,10 @@ public class UserController {
         Optional<User> userOpt = getUserById(userId);
         if(userOpt.isPresent()){
             User user = userOpt.get();
-            user.setFamily(new Family(user.getName() + "'s Family"));
+            user.setDefaultFamily();
             return new ResponseEntity<>(true, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
         }
     }
-
 }

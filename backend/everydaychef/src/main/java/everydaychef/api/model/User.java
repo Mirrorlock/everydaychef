@@ -1,5 +1,9 @@
 package everydaychef.api.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import net.minidev.json.annotate.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,16 +20,20 @@ public class User {
     private char account_type;
 
     @ManyToOne
+    @JoinColumn(name="family_id")
+    @JsonManagedReference
     private Family family;
 
     @ManyToMany
+    @JoinTable(name="liked_recipes", inverseJoinColumns = @JoinColumn(name="recipe_id"))
+    @JsonBackReference
     private Set<Recipe> likedRecipes;
 
-    @ManyToMany
-        @JoinTable(name="user_invitations",
-                joinColumns = @JoinColumn(name="user_id"),
-                inverseJoinColumns= @JoinColumn(name="family_id"))
-
+    @JoinTable(name="user_invitations",
+            joinColumns = {@JoinColumn(name="user_id")},
+            inverseJoinColumns={@JoinColumn(name="family_id")})
+    @ManyToMany()
+    @JsonBackReference
     private Set<Family> familyInviters;
 
     public User() {
@@ -35,14 +43,14 @@ public class User {
         this.name = name;
         this.password = password;
         this.family = family;
-        likedRecipes = new HashSet<Recipe>();
+        likedRecipes = new HashSet<>();
     }
 
     public User(String name, char account_type, Family family){
         this.name = name;
         this.account_type = account_type;
         this.family = family;
-        likedRecipes = new HashSet<Recipe>();
+        likedRecipes = new HashSet<>();
     }
 
     public int getId() {
@@ -77,6 +85,10 @@ public class User {
         this.family = family;
     }
 
+    public void setDefaultFamily(){
+        this.family = new Family(name + "'s Family");
+    }
+
     public Set<Recipe> getLikedRecipes() {
         return likedRecipes;
     }
@@ -104,4 +116,6 @@ public class User {
     public Set<Family> getInvitations() {
         return familyInviters;
     }
+
+
 }

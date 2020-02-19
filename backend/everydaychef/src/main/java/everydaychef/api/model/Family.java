@@ -1,5 +1,10 @@
 package everydaychef.api.model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -20,11 +25,21 @@ public class Family {
 
     private String name;
 
-    @OneToMany
+    @JsonBackReference
+    @OneToMany(mappedBy = "family")
     private Set<User> users;
 
-    @ManyToMany(mappedBy = "familyInviters")
-    private Set<User> invitedUsers;
+//    public Set<User> getInvitedUsers() {
+//        return invitedUsers;
+//    }
+//
+//    public void setInvitedUsers(Set<User> invitedUsers) {
+//        this.invitedUsers = invitedUsers;
+//    }
+//
+//    @ManyToMany(mappedBy = "familyInviters")
+//    @JsonBackReference
+//    private Set<User> invitedUsers;
 
     public int getId() {
         return id;
@@ -50,11 +65,12 @@ public class Family {
         this.users = users;
     }
 
-    public Set<User> getInvitedUsers() {
-        return invitedUsers;
-    }
-
-    public void setInvitedUsers(Set<User> invitedUsers) {
-        this.invitedUsers = invitedUsers;
-    }
+    //
+//    public Set<User> getInvitedUsers() {
+//        return invitedUsers;
+//    }
+//
+//    public void setInvitedUsers(Set<User> invitedUsers) {
+//        this.invitedUsers = invitedUsers;
+//    }
 }
