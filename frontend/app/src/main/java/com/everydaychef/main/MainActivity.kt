@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavController
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
     }
 
     private fun authenticateUser(){
-        authViewModel.currentUser.observe(this, Observer{
+        authViewModel.currentUserLd.observe(this, Observer{
             if (!authViewModel.isUserSignedIn()) {
                 goToLogin()
             } else {
@@ -81,7 +82,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
     }
 
     private fun goToLogin() {
-        navController.navigate(R.id.action_nav_home_to_nav_login)
+        startActivity(Intent(this, LoginActivity::class.java))
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -97,7 +98,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
     }
 
     fun signOut(item: MenuItem) {
-        authViewModel.signOut()
+        authViewModel.signOut(this)
         popupUtility.displayShortDefault("Successfully signed out!")
         goToLogin()
     }
@@ -107,13 +108,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
 //        if(!authViewModel.isUserSignedIn()){
 //            user_name.visibility = View.GONE
 //            user_email.text = getString(R.string.nav_header_login_first)
-//            user_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person))
 //        } else {
         user_name.visibility = View.VISIBLE
-        user_email.text = authViewModel.currentUser.value!!.email
-        user_name.text = authViewModel.currentUser.value!!.username
-        authViewModel.currentUser.value!!.photoUrl.let{
-            Glide.with(this).load(it).into(user_image)
+        user_email.text = authViewModel.currentUserLd.value!!.email
+        user_name.text = authViewModel.currentUserLd.value!!.username
+        val photoUrl = authViewModel.currentUserLd.value!!.photoUrl
+        if(photoUrl != ""){
+            Glide.with(this).load(photoUrl).into(user_image)
+        }else {
+            user_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person))
         }
         popupUtility.displayShortTop("Logged in as: " + user_name.text)
     }

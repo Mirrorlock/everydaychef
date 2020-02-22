@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.ui.profile.ProfileFragment">
+    tools:context=".main.ui.profile.ProfileFragment"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
     <RelativeLayout
         android:id="@+id/profile_header"
         android:layout_width="match_parent"
@@ -68,8 +69,7 @@
         android:id="@+id/profile_family_tag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_alignBaseline="@id/profile_family_name"
+        android:layout_below="@id/profile_header"
         android:typeface="serif"
         app:fontFamily="cursive"
         android:textAlignment="center"
@@ -77,89 +77,110 @@
         android:textColor="@color/colorAccent"
         android:text="Family: "/>
 
-    <TextView
-        android:id="@+id/profile_family_members_tag"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/profile_family_tag"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="15dp"
-        android:text="Members: "
-        android:textAlignment="center"
-        android:textColor="@color/colorAccent"
-        android:textSize="30sp"
-        android:typeface="serif"
-        app:fontFamily="cursive" />
 
     <TextView
         android:id="@+id/profile_family_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/profile_family_tag"
-        android:layout_toEndOf="@id/profile_family_tag"
         android:layout_below="@id/profile_header"
-        android:text="Simens"
-        android:textColor="@color/colorAccent"
-        android:textSize="50sp"
-        android:textAlignment="center"/>
-
-    <ScrollView
-        android:id="@+id/profile_scroll"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_below="@id/profile_family_members_tag">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_profile_family_member1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="cursive"
-                android:textColor="@color/colorAccent"
-                android:text="Veronika"
-                android:textSize="@dimen/big_text"
-                android:textStyle="bold"
-                android:textAlignment="center"/>
-        </LinearLayout>
-    </ScrollView>
-
-    <TextView
-        android:id="@+id/profile_family_actions_tag"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/profile_family_actions_layout"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="15dp"
-        android:text="Actions: "
-        android:textAlignment="center"
-        android:textColor="@color/colorAccent"
-        android:textSize="30sp"
+        android:layout_toEndOf="@id/profile_family_tag"
+        android:layout_toRightOf="@+id/profile_family_tag"
+        app:fontFamily="cursive"
         android:typeface="serif"
-        app:fontFamily="cursive" />
+        android:text="Simens"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimary"
+        android:textSize="44sp" />
+
+<!--    <ScrollView-->
+<!--        android:id="@+id/profile_scroll"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="200dp"-->
+<!--        android:layout_below="@id/profile_family_members_tag">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tv_profile_family_member1"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:fontFamily="cursive"-->
+<!--                android:text="Veronika"-->
+<!--                android:textAlignment="center"-->
+<!--                android:textColor="@color/colorPrimary"-->
+<!--                android:textSize="@dimen/big_text"-->
+<!--                android:textStyle="bold" />-->
+<!--        </LinearLayout>-->
+<!--    </ScrollView>-->
+
+<!--    <ListView-->
+<!--        android:id="@+id/family_members"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/profile_family_members_tag"-->
+<!--        />-->
+
+
+
+<!--    <TextView-->
+<!--        android:id="@+id/profile_family_actions_tag"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@+id/family_members"-->
+<!--        android:layout_alignParentStart="true"-->
+<!--        android:layout_alignParentLeft="true"-->
+<!--        android:layout_marginStart="15dp"-->
+<!--        android:layout_marginLeft="15dp"-->
+<!--        android:layout_marginTop="17dp"-->
+<!--        android:text="Actions: "-->
+<!--        android:textAlignment="center"-->
+<!--        android:textColor="@color/colorAccent"-->
+<!--        android:textSize="30sp"-->
+<!--        android:typeface="serif"-->
+<!--        app:fontFamily="cursive" />-->
 
     <LinearLayout
         android:id="@+id/profile_family_actions_layout"
         android:layout_width="wrap_content"
-        android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="36dp"
+        android:gravity="center"
         android:orientation="vertical">
-        <Button
-            android:layout_width="200dp"
-            android:layout_height="70dp"
-            android:background="@color/red"
-            android:textColor="@color/white"
-            android:text="Leave Family"/>
 
+        <Button
+            android:id="@+id/btn_add_members"
+            android:layout_width="200dp"
+            android:layout_marginBottom="10sp"
+            android:layout_height="40dp"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/white"
+            android:text="Invite members"/>
+
+        <Button
+            android:id="@+id/btn_create_family"
+            android:layout_width="200dp"
+            android:layout_marginBottom="10sp"
+            android:layout_height="40dp"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/white"
+            android:text="Create New Family"/>
+
+        <Button
+            android:id="@+id/btn_leave_family"
+            android:layout_width="232dp"
+            android:layout_height="wrap_content"
+            android:background="@color/red"
+            android:text="Leave Family"
+            android:textColor="@color/white" />
 
     </LinearLayout>
-<!--    <GridView-->
+    <!--    <GridView-->
 <!--        android:id="@+id/profile_family_members_grid"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->

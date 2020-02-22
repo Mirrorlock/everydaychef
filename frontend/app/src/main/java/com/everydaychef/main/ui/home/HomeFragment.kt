@@ -30,7 +30,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (this.activity?.application as EverydayChefApplication).appComponent.inject(this)
-        Log.println(Log.DEBUG, "PRINT", "Our current user is: " + loginViewModel.currentUser.value.toString())
+        Log.println(Log.DEBUG, "PRINT", "Our current user is: " + loginViewModel.currentUserLd.value.toString())
 
     }
 

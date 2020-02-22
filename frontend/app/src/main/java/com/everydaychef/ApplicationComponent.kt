@@ -1,8 +1,10 @@
 package com.everydaychef
 
 import com.everydaychef.auth.LoginActivity
+import com.everydaychef.auth.RegisterActivity
 import com.everydaychef.main.MainActivity
 import com.everydaychef.main.ui.home.HomeFragment
+import com.everydaychef.main.ui.profile.ProfileFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -11,8 +13,7 @@ import javax.inject.Singleton
 interface ApplicationComponent {
     fun inject(activity: MainActivity)
     fun inject(activity: LoginActivity)
+    fun inject(activity: RegisterActivity)
     fun inject(fragment: HomeFragment)
-
-//    fun viewModel(userRepository: UserRepository): LoginViewModel
-//    fun repository(): UserRepository
+    fun inject(fragment: ProfileFragment)
 }

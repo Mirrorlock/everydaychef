@@ -23,7 +23,8 @@
         app:layout_constraintEnd_toEndOf="@+id/google_sign_in_button"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/google_sign_in_button"
-        facebook:com_facebook_login_text="Sign in" />
+        facebook:com_facebook_login_text="Sign in"
+        facebook:com_facebook_logout_text="Sign in" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/google_sign_in_button"
@@ -113,7 +114,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:onClick="loginOnClick"/>
 
     <Button
         android:id="@+id/register_button"
@@ -130,7 +132,8 @@
         app:fontFamily="cursive"
         app:layout_constraintBottom_toTopOf="@+id/login_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:onClick="registerOnClick"/>
 
     <TextView
         android:id="@+id/tv_or"

@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -40,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
                 AuthenticationState.MANUALLY_AUTHENTICATED,
                 AuthenticationState.FACEBOOK_AUTHENTICATED,
                 AuthenticationState.GOOGLE_AUTHENTICATED  -> returnToMain()
-                AuthenticationState.INVALID_AUTHENTICATION -> showError("")
+                AuthenticationState.INVALID_AUTHENTICATION -> showError("Invalid Authentication!")
                 else -> {}
             }
         })
@@ -80,12 +81,6 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-//    override fun onBackPressed() {
-////        super.onBackPressed()
-//        authViewModel.refuseAuthentiation()
-//
-//    }
-
 
     private var doubleBackToExitPressedOnce = false
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -104,6 +99,20 @@ class LoginActivity : AppCompatActivity() {
     private fun returnToMain() {
         findNavController(R.id.login_host).popBackStack()
         finish()
+    }
+
+    fun loginOnClick(view: View) {
+        val username: String = et_username.text.toString()
+        val password: String = et_password.text.toString()
+        if(username.length > 3 && password.length > 3){
+            authViewModel.manuallySignIn(username, password)
+        }else{
+            authViewModel.refuseAuthentication()
+        }
+    }
+
+    fun registerOnClick(view: View) {
+        startActivity(Intent(this, RegisterActivity::class.java))
     }
 
 

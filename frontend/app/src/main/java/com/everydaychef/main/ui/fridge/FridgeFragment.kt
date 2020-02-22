@@ -19,8 +19,8 @@ class FridgeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        galleryViewModel =
-            ViewModelProviders.of(this).get(FridgeViewModel::class.java)
+//        galleryViewModel =
+//            ViewModelProviders.of(this).get(FridgeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_fridge, container, false)
         val textView: TextView = root.findViewById(R.id.text_gallery)
         galleryViewModel.text.observe(this, Observer {

@@ -1,4 +1,4 @@
-package com.everydaychef.auth
+package com.everydaychef.main.models
 
 import com.google.gson.annotations.SerializedName
 
@@ -9,6 +9,9 @@ class User {
     @SerializedName("name")
     var name = ""
 
+    @SerializedName("email")
+    var email = ""
+
     @SerializedName("password")
     var password = ""
 
@@ -16,13 +19,14 @@ class User {
     var accountType = ""
 
     @SerializedName("family")
-    var family: Family = Family()
+    var family: Family =
+        Family()
 
     @SerializedName("invitations")
-    var invitations: List<String>? = null
+    var invitations: List<Family>? = null
 
     override fun toString(): String {
-        return "User(id=$id, name='$name', password='$password', accountType='$accountType', family=$family, invitations=$invitations)"
+        return "User(id=$id, name='$name', email='$email', password='$password', accountType='$accountType', family=$family, invitations=$invitations)"
     }
 
 

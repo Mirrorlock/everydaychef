@@ -8,8 +8,8 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.everydaychef.R
+import com.everydaychef.main.repositories.UserRepository
 import com.facebook.*
-import com.facebook.login.Login
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
@@ -21,8 +21,11 @@ import com.google.android.gms.common.SignInButton
 import org.json.JSONException
 import javax.inject.Inject
 class AuthViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
-//    var  tempRepository: TempRepository
-    val currentUser = userRepository.currentUser
+    val errorMessage: String
+        get() = userRepository.errorMessage
+
+    //    var  tempRepository: TempRepository
+    val currentUserLd = userRepository.currentUserLd
     val authenticationState: MutableLiveData<AuthenticationState>
             = userRepository.authenticationState
 //
@@ -30,16 +33,11 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
         return userRepository.userSignedIn
     }
 
-    var i = 5
-
     // MANUAL AUTHENTICATION //
     fun manuallySignIn(username: String, password: String) {
-        if (userRepository.passwordIsValidForUsername(username, password)) {
-            userRepository.setCurrentUser(username)
-            userRepository.setUserAuthenticationState("manual")
-        } else {
-            userRepository.setUserAuthenticationState("invalid")
-        }
+//        val accessToken = userRepository.passwordIsValidForUsername(username, password)
+//        if (accessToken.isNotEmpty()) {
+        userRepository.setCurrentUser(username = username)
     }
     // MANUAL AUTHENTICATION //
 
@@ -73,8 +71,13 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
 
     fun fillDataFromGoogleAccount() {
         Log.println(Log.DEBUG, "PRINT", "We are here!")
-        userRepository.setCurrentUser(currentGoogleUser)
-        userRepository.setUserAuthenticationState("google")
+        userRepository.setCurrentUser(
+            username    = currentGoogleUser?.displayName.toString(),
+            accessToken = currentGoogleUser?.idToken.toString(),
+            email       = currentGoogleUser?.email.toString(),
+            method      = "google",
+            photoUrl    = currentGoogleUser?.photoUrl.toString()
+        )
     }
     // GOOGLE AUTHENTICATION //
 
@@ -125,8 +128,13 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
                 val image =
                     `object`.getJSONObject("picture").getJSONObject("data").getString("url")
                 Log.println(Log.DEBUG, "PRINT", "$name with $email and imageURL: $image")
-                userRepository.setCurrentUser(name, email, image, accessToken.token)
-                userRepository.setUserAuthenticationState("facebook")
+                userRepository.setCurrentUser(
+                    username = name,
+                    accessToken = accessToken.token,
+                    email = email,
+                    method = "facebook",
+                    photoUrl = image
+                )
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
@@ -139,12 +147,17 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
     }
     // FACEBOOK AUTHENTICATION //
 
-    fun signOut() {
-        userRepository.signOut()
+    fun signOut(activity: Activity) {
+        userRepository.signOut(activity)
     }
 
-    fun refuseAuthentiation() {
+    fun refuseAuthentication(errorMessage: String = "Invalid authentication") {
+        userRepository.errorMessage = errorMessage
         userRepository.setUserAuthenticationState("invalid")
+    }
+
+    fun register(username: String, password: String, email: String) {
+        userRepository.register(username, password, email)
     }
 }
 
