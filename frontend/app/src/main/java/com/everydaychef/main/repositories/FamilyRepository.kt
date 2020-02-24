@@ -6,6 +6,8 @@ import com.everydaychef.auth.CurrentUser
 import com.everydaychef.main.models.Family
 import com.everydaychef.main.models.User
 import com.everydaychef.main.services.FamilyService
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -51,6 +53,19 @@ class FamilyRepository @Inject constructor(private val familyService: FamilyServ
             }
         })
 
+    }
+
+    fun getNonMembers(familyId: Int): ArrayList<User>{
+        var uninvitedUsers = ArrayList<User>()
+        val receiveUsersThread = Thread{
+            uninvitedUsers = familyService.getNonMembers(familyId)
+                .execute().body()
+        }
+        receiveUsersThread.start()
+        receiveUsersThread.join()
+        Log.println(Log.DEBUG,"PRINT", "Uninvited users thread received are " +
+                uninvitedUsers.toString())
+        return uninvitedUsers
     }
 
 }

@@ -10,7 +10,10 @@ interface FamilyService {
     @GET("family/{id}/members")
     fun getMembers(@Path("id") id: Int): Call<Set<User>>
 
-    @PUT("user/{userId}/family/{familyName}/change")
+    @PUT("user/{userId}/family/{familyName}")
     fun changeUserFamily(@Path("userId") userId: Int,
                          @Path("familyName") familyName: String) : Call<Family>
+
+    @GET("family/{id}/nonmembers")
+    fun getNonMembers(@Path("id") familyId: Int): Call<ArrayList<User>>
 }

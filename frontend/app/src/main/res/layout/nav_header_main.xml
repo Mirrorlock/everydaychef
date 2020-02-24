@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -19,18 +19,41 @@
         android:layout_height="90dp"
         android:contentDescription="@string/nav_header_desc"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.18"
         tools:srcCompat="@drawable/ic_person" />
 
     <TextView
         android:id="@+id/user_name"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:text="Test Testov"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        app:layout_constraintStart_toStartOf="@+id/user_image"
+        app:layout_constraintTop_toBottomOf="@+id/user_image" />
 
     <TextView
         android:id="@+id/user_email"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="test.test@testing.com"
+        app:layout_constraintStart_toStartOf="@+id/user_name"
+        app:layout_constraintTop_toBottomOf="@+id/user_name" />
 
-</LinearLayout>
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/notification_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_notifications"
+        android:fadingEdge="horizontal|vertical|none"
+        android:onClick="onClick"
+        android:src="@drawable/ic_notifications"
+        app:layout_constraintBottom_toBottomOf="@+id/user_email"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_name" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

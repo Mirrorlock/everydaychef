@@ -4,22 +4,15 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.everydaychef.auth.CurrentUser
-import com.everydaychef.main.models.Family
+import com.everydaychef.main.models.User
 import com.everydaychef.main.repositories.FamilyRepository
 import com.everydaychef.main.repositories.UserRepository
 import javax.inject.Inject
 
 class ProfileViewModel @Inject constructor(private val userRepository: UserRepository,
                                            private val familyRepository: FamilyRepository): ViewModel() {
-//    val currentUser: MutableLiveData<CurrentUser>
-//        get() = userRepository.currentUser
-    var currentUserFamily = MutableLiveData<Family>()
+    var familyNonMembers = ArrayList<User>()
     var message = MutableLiveData<String>()
-//    var otherCurrentUser = MutableLiveData<CurrentUser>()
-////
-//    init {
-//        otherCurrentUser = userRepository.currentUser
-//    }
 
     fun getCurrentUser(): MutableLiveData<CurrentUser>{
         return userRepository.currentUserLd
@@ -37,5 +30,31 @@ class ProfileViewModel @Inject constructor(private val userRepository: UserRepos
 
     fun leaveFamily() {
         userRepository.leaveFamily(message)
+    }
+
+    fun getFamilyNonMembers(): Array<String> {
+        familyNonMembers = familyRepository.getNonMembers(getCurrentUser().value!!.user.family.id)
+        return familyNonMembers.map { user -> user.name }.toTypedArray()
+    }
+
+    fun getInvitedArrayIndexes(nonMembersArray: Array<String>): BooleanArray{
+        var invitedNonMembers = familyNonMembers.filter { nonMember ->
+            nonMember.invitations != null &&
+                    nonMember.invitations!!.contains(getCurrentUser().value!!.user.family)
+            }
+        var resultIndexes = Array(nonMembersArray.size) {i -> false}
+        for(nonMember in invitedNonMembers){
+            resultIndexes[nonMembersArray.indexOf(nonMember.name)] = true
+        }
+        return resultIndexes.toBooleanArray()
+
+    }
+
+    fun inviteUsers(checkedUsers: ArrayList<Int>) {
+        Log.println(Log.DEBUG, "PRINT", "Inviting users: ${checkedUsers}, to family: " + getCurrentUser().value!!.user.family.toString())
+        for (checkedUser in checkedUsers){
+            val userId = familyNonMembers[checkedUser].id
+            userRepository.inviteUserToFamily(userId, getCurrentUser().value!!.user.family.id, message)
+        }
     }
 }

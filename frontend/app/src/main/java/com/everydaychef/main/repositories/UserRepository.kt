@@ -23,6 +23,7 @@ import javax.inject.Singleton
 class UserRepository @Inject constructor (private val userService: UserService){
     var currentUserLd = MutableLiveData<CurrentUser>()
         private set
+
     var googleSignInClient: GoogleSignInClient? = null
 
     val userSignedIn: Boolean
@@ -230,6 +231,83 @@ class UserRepository @Inject constructor (private val userService: UserService){
 
             })
         }
+    }
+
+    fun inviteUserToFamily(userId: Int, familyId: Int, message: MutableLiveData<String>) {
+        Log.println(Log.DEBUG, "PRINT", "Inviting user with id $userId to family with id $familyId")
+        userService.inviteUserToFamily(userId, familyId, HashMap()).enqueue(object: Callback<Boolean>{
+            override fun onFailure(call: Call<Boolean>?, t: Throwable?) {
+                Log.println(Log.DEBUG, "PRINT", "Error from inviteUser(): " + t.toString())
+                Log.println(Log.ERROR, "process_invite_user", "Error from inviteUser(): " + t.toString())
+            }
+
+            override fun onResponse(call: Call<Boolean>?, response: Response<Boolean>?) {
+                if (response != null) {
+                    if (response.isSuccessful) {
+                        message.value = "User invited successfully!"
+                    } else {
+                        message.value = "Error!"
+                    }
+                } else {
+                    message.value = "There was an error!"
+                }
+            }
+
+        })
+    }
+
+    fun getInvitaions(invitations: MutableLiveData<ArrayList<Family>>, message: MutableLiveData<String>) {
+        userService.getInvitations(currentUserLd.value!!.id).enqueue(object: Callback<ArrayList<Family>>{
+            override fun onFailure(call: Call<ArrayList<Family>>?, t: Throwable?) {
+                Log.println(Log.DEBUG, "PRINT", "Error from getInvitations(): " + t.toString())
+                Log.println(Log.ERROR, "process_invite_user", "Error from getInvitations(): " + t.toString())
+            }
+
+            override fun onResponse(call: Call<ArrayList<Family>>?, response: Response<ArrayList<Family>>?) {
+                if (response != null) {
+                    Log.println(Log.DEBUG, "PRINT", "Response received: " + response!!.body() )
+                    if(response.isSuccessful){
+                        invitations.value = response.body()
+                    }else{
+                        message.value = "Error in collecting notifications!"
+                    }
+                }else{
+                    message.value = "There was an Error!"
+                }
+            }
+        })
+    }
+
+    fun answerInvitation(userId: Int, familyId: Int, isAccepted: Boolean,
+                         message: MutableLiveData<String>) {
+        userService.answerInvitation(userId, familyId, hashMapOf("isAccepted" to isAccepted))
+            .enqueue(object: Callback<User> {
+            override fun onFailure(call: Call<User>?, t: Throwable?) {
+                Log.println(Log.DEBUG, "PRINT", "Error from getInvitations(): " + t.toString())
+                Log.println(
+                    Log.ERROR,
+                    "process_invite_user",
+                    "Error from getInvitations(): " + t.toString()
+                )
+            }
+
+            override fun onResponse(call: Call<User>?, response: Response<User>?) {
+                if (response != null) {
+                    Log.println(Log.DEBUG, "PRINT", "Response received: " + response!!.body())
+                    if (response.isSuccessful) {
+                        var newCurrentUser = currentUserLd.value
+                        newCurrentUser!!.user = response.body()
+                        currentUserLd.value = newCurrentUser
+                        message.value = "Successfully accepted invitation to join " +
+                                response.body().family.name
+                    } else {
+                        message.value = "Error in collecting notifications!"
+                    }
+                } else {
+                    message.value = "There was an Error!"
+                }
+            }
+        })
     }
 }
 

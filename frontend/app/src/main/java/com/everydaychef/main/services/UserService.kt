@@ -15,21 +15,24 @@ interface UserService {
     @GET("user/name/{username}")
     fun getUserByUsername(@Path("username") username: String): Call<User>
 
-//    @FormUrlEncoded
-//    @POST("authenticate")
-//    fun authenticate(@Field("username") username: String,
-//                     @Field("password") password: String): Call<String> // ACQUIRE TOKEN
-//
-//    @POST("user")
-//    fun create(@Query("username") username: String,
-//               @Query("email") email: String,
-//               @Query("authentication_method") authenticationMethod: Char): Call<Any>@POST("user")
+    @GET("user/{userId}/invitations")
+    fun getInvitations(@Path("userId") userId: Int): Call<ArrayList<Family>>
+
     @POST("user")
     fun create(@Body body: HashMap<String, Any>): Call<Any>
 
     @DELETE("user/{userId}/family")
     fun leaveFamily(@Path("userId") userId: Int): Call<Family>
-//
+
+    @PUT("user/{userId}/family/{familyId}/invite")
+    fun inviteUserToFamily(@Path("userId") userId: Int, @Path("familyId") familyId: Int,
+                   @Body body: HashMap<String, Any>): Call<Boolean>
+
+    @PUT("user/{userId}/family/{familyId}/answer_invitation")
+    fun answerInvitation(@Path("userId") userId: Int, @Path("familyId") familyId: Int,
+                    @Body body: HashMap<String, Boolean>): Call<User>
+
+
 //    @POST("user")
 //    fun create(@Query("username") username: String, @Query("password") password: String,
 //               @Query("email") email: String): Call<Any>

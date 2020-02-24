@@ -29,18 +29,33 @@ class User {
         return "User(id=$id, name='$name', email='$email', password='$password', accountType='$accountType', family=$family, invitations=$invitations)"
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-}
+        other as User
 
-class Family{
-    @SerializedName("id")
-    var id = 0
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (email != other.email) return false
+        if (password != other.password) return false
+        if (accountType != other.accountType) return false
+        if (family != other.family) return false
+        if (invitations != other.invitations) return false
 
-    @SerializedName("name")
-    var name = ""
-
-    override fun toString(): String {
-        return "Family(id=$id, name='$name')"
+        return true
     }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + name.hashCode()
+        result = 31 * result + email.hashCode()
+        result = 31 * result + password.hashCode()
+        result = 31 * result + accountType.hashCode()
+        result = 31 * result + family.hashCode()
+        result = 31 * result + (invitations?.hashCode() ?: 0)
+        return result
+    }
+
 
 }

@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavController
@@ -75,7 +76,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
             if (!authViewModel.isUserSignedIn()) {
                 goToLogin()
             } else {
-                popupUtility.displayLongDefault("Logged in as: " + it.email)
+                popupUtility.displayLongDefault("Logged in as: " + it.username)
                 updateHeaderUI()
             }
         })
@@ -93,6 +94,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         when (p0?.id) {
             R.id.user_image -> {
                 navController.navigate(R.id.nav_profile)
+                drawer_layout.closeDrawer( GravityCompat.START)
+            }
+            R.id.notification_button -> {
+                navController.navigate(R.id.action_global_to_notifications_fragment)
+                drawer_layout.closeDrawer( GravityCompat.START)
             }
         }
     }
@@ -105,10 +111,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
 
     private fun updateHeaderUI(){
         Log.println(Log.DEBUG, "PRINT", "Updating the header UI!" + authViewModel.isUserSignedIn())
-//        if(!authViewModel.isUserSignedIn()){
-//            user_name.visibility = View.GONE
-//            user_email.text = getString(R.string.nav_header_login_first)
-//        } else {
         user_name.visibility = View.VISIBLE
         user_email.text = authViewModel.currentUserLd.value!!.email
         user_name.text = authViewModel.currentUserLd.value!!.username
@@ -118,7 +120,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         }else {
             user_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person))
         }
-        popupUtility.displayShortTop("Logged in as: " + user_name.text)
     }
 
     fun showSettings(item: MenuItem) {

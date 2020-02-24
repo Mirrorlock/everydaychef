@@ -2,6 +2,7 @@ package com.everydaychef.main.ui.profile
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,7 @@ import com.everydaychef.auth.AuthViewModel
 import com.everydaychef.auth.CurrentUser
 import com.everydaychef.main.helpers.PopupUtility
 import kotlinx.android.synthetic.main.dialog_create_family.*
+import kotlinx.android.synthetic.main.dialog_create_family.view.*
 import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 import java.util.*
@@ -28,7 +30,6 @@ import javax.inject.Inject
 
 class ProfileFragment : Fragment(), View.OnClickListener {
 
-    @Inject lateinit var authViewModel: AuthViewModel
     @Inject lateinit var profileViewModel: ProfileViewModel
     private var user: CurrentUser? = null
     private lateinit var alertDialogBuilder: AlertDialog.Builder
@@ -117,13 +118,13 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
             btn_create_family.id -> {
                 Log.println(Log.DEBUG, "PRINT", "Clicked create family!")
-                val newFamilyNameEt = EditText(activity)
-                newFamilyNameEt.hint = "Set new family name"
-                AlertDialog.Builder(activity).setView(newFamilyNameEt)
-                    .setTitle("New Family")
+                val dialogViewRoot = LayoutInflater.from(activity)
+                    .inflate( R.layout.dialog_create_family, null)
+                AlertDialog.Builder(activity)
+                    .setView(dialogViewRoot)
                     .setPositiveButton("Create") { dialog, which ->
                     popupUtility.displayShortDefault("Creating new family")
-                    profileViewModel.createFamily(newFamilyNameEt.text.toString())
+                    profileViewModel.createFamily(dialogViewRoot.new_family_name.text.toString())
                 }
                 .setNeutralButton("Cancel") { dialog, which ->
                     popupUtility.displayShortDefault("Canceled creating family!")
@@ -132,7 +133,26 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
             btn_add_members.id -> {
                 Log.println(Log.DEBUG, "PRINT", "Clicked add members button!")
+                addMembers()
             }
         }
+    }
+
+    private fun addMembers() {
+        var nonMembers = profileViewModel.getFamilyNonMembers()
+        var previouslyCheckedUsers  = profileViewModel.getInvitedArrayIndexes(nonMembers)
+        var checkedUsers = ArrayList<Int>()
+        Log.println(Log.DEBUG, "PRINT", "Received non-member users in the fragment are: \n" +
+                nonMembers.toString())
+        AlertDialog.Builder(activity)
+            .setTitle("Invite members to family")
+            .setMultiChoiceItems(nonMembers, previouslyCheckedUsers )
+                { dialog, which, isChecked ->
+                    if(isChecked) checkedUsers.add(which)
+                    else checkedUsers.remove(which)
+                }.setPositiveButton("Add Members"){dialog, which ->
+                    profileViewModel.inviteUsers(checkedUsers)
+                }.setNeutralButton("Cancel"){dialog, which -> }
+            .create().show()
     }
 }
