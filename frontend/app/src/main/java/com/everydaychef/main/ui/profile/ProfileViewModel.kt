@@ -33,16 +33,16 @@ class ProfileViewModel @Inject constructor(private val userRepository: UserRepos
     }
 
     fun getFamilyNonMembers(): Array<String> {
-        familyNonMembers = familyRepository.getNonMembers(getCurrentUser().value!!.user.family.id)
+        familyNonMembers = familyRepository.getNonMembers(getCurrentUser().value!!.user.family.id, message)
         return familyNonMembers.map { user -> user.name }.toTypedArray()
     }
 
     fun getInvitedArrayIndexes(nonMembersArray: Array<String>): BooleanArray{
-        var invitedNonMembers = familyNonMembers.filter { nonMember ->
+        val invitedNonMembers = familyNonMembers.filter { nonMember ->
             nonMember.invitations != null &&
                     nonMember.invitations!!.contains(getCurrentUser().value!!.user.family)
             }
-        var resultIndexes = Array(nonMembersArray.size) {i -> false}
+        val resultIndexes = Array(nonMembersArray.size) { i -> false}
         for(nonMember in invitedNonMembers){
             resultIndexes[nonMembersArray.indexOf(nonMember.name)] = true
         }

@@ -12,15 +12,13 @@ import com.everydaychef.EverydayChefApplication
 import com.everydaychef.R
 import com.everydaychef.main.helpers.PopupUtility
 import kotlinx.android.synthetic.main.fragment_notifications.*
-import kotlinx.android.synthetic.main.notification_row.view.*
+import kotlinx.android.synthetic.main.row_notification.view.*
 import javax.inject.Inject
 
 class NotificationsFragment: Fragment() {
 
     @Inject lateinit var notificationsViewModel: NotificationsViewModel
     private lateinit var popupUtility: PopupUtility
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,8 +36,14 @@ class NotificationsFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        notificationsViewModel.message.observe(viewLifecycleOwner, Observer{
+            if(it.isNotEmpty()){
+                popupUtility.displayShortDefault(it)
+                notificationsViewModel.message.value = ""
+            }
+        })
         notificationsViewModel.getUserInvitations()
-        notificationsViewModel.invitations.observe(this, Observer{
+        notificationsViewModel.invitations.observe(viewLifecycleOwner, Observer{
             Log.println(Log.DEBUG, "PRINT", "Invitaions changed")
             if(context != null){
                 if(notifications_lv.adapter == null){
@@ -52,6 +56,4 @@ class NotificationsFragment: Fragment() {
             }
         })
     }
-
-
 }

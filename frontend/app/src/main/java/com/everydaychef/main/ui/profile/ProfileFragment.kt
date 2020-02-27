@@ -20,6 +20,7 @@ import com.everydaychef.EverydayChefApplication
 import com.everydaychef.R
 import com.everydaychef.auth.AuthViewModel
 import com.everydaychef.auth.CurrentUser
+import com.everydaychef.main.helpers.MessageUtility
 import com.everydaychef.main.helpers.PopupUtility
 import kotlinx.android.synthetic.main.dialog_create_family.*
 import kotlinx.android.synthetic.main.dialog_create_family.view.*
@@ -31,6 +32,8 @@ import javax.inject.Inject
 class ProfileFragment : Fragment(), View.OnClickListener {
 
     @Inject lateinit var profileViewModel: ProfileViewModel
+//    @Inject lateinit var messageUtility: MessageUtility
+
     private var user: CurrentUser? = null
     private lateinit var alertDialogBuilder: AlertDialog.Builder
     private lateinit var popupUtility: PopupUtility
@@ -52,16 +55,19 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        profileViewModel.getCurrentUser().observe(this, Observer{
+        profileViewModel.getCurrentUser().observe(viewLifecycleOwner, Observer{
             Log.println(Log.DEBUG, "PRINT", "Changed user detected!")
             it?.let{
                 Log.println(Log.DEBUG, "PRINT", "Current user change was detected: " + it.user.toString())
                 updateUI()
             }
         })
-        profileViewModel.message.observe(this, Observer{
-            popupUtility.displayShortDefault(it)
-        })
+//        profileViewModel.message.observe(viewLifecycleOwner, Observer{
+//            if(it.isNotEmpty()){
+//                popupUtility.displayShortDefault(it)
+//                profileViewModel.message.value = ""
+//            }
+//        })
         btn_leave_family.setOnClickListener(this)
         btn_add_members.setOnClickListener(this)
     }

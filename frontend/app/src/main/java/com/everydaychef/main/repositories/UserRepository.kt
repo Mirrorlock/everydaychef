@@ -31,7 +31,6 @@ class UserRepository @Inject constructor (private val userService: UserService){
 
     var authenticationState = MutableLiveData<AuthenticationState>()
 
-//        set(value) = setUserSignedInMethod(value.toString())
     var errorMessage: String = ""
 
     init{
@@ -298,6 +297,7 @@ class UserRepository @Inject constructor (private val userService: UserService){
                         var newCurrentUser = currentUserLd.value
                         newCurrentUser!!.user = response.body()
                         currentUserLd.value = newCurrentUser
+
                         message.value = "Successfully accepted invitation to join " +
                                 response.body().family.name
                     } else {

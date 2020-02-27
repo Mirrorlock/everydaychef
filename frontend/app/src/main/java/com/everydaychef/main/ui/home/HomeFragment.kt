@@ -38,7 +38,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         activity?.let{
 //            loginViewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
-//            loginViewModel?.authenticationState?.observe(this, Observer {
+//            loginViewModel?.authenticationState?.observe(viewLifecycleOwner, Observer {
 //                updateHomeUI()
 //            })
         }

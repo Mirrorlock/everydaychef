@@ -10,7 +10,6 @@ class CurrentUser{
     var token: String = ""
     var email: String = ""
     var photoUrl: String = ""
-    var changed: Boolean = false
 
     override fun toString(): String {
         return "CurrentUser(username='$username', token='$token', email='$email', photoUrl='$photoUrl')"

@@ -3,8 +3,9 @@ package com.everydaychef.main.helpers
 import android.content.Context
 import android.view.Gravity
 import android.widget.Toast
+import javax.inject.Inject
 
-class PopupUtility(private val context: Context) {
+class PopupUtility @Inject constructor(private val context: Context) {
 
     fun displayShortDefault(message: String){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

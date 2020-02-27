@@ -23,7 +23,7 @@ class ToolsFragment : Fragment() {
             ViewModelProviders.of(this).get(ToolsViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_shopping_list, container, false)
         val textView: TextView = root.findViewById(R.id.text_tools)
-        toolsViewModel.text.observe(this, Observer {
+        toolsViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = it
         })
         return root
