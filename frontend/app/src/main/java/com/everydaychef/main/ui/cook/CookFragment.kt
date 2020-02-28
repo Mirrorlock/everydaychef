@@ -43,7 +43,7 @@ class CookFragment : Fragment() {
                 progressBar.visibility = View.GONE
                 Log.println(Log.DEBUG, "PRINT", "Found recipes: $it")
                 if(recipes_list_view.adapter == null)
-                    recipes_list_view.adapter = CookDataAdapter(context!!, R.layout.row_recipe, it)
+                    recipes_list_view.adapter = CookDataAdapter(context!!, R.layout.row_recipe, it, cookViewModel)
                 else{
                     (recipes_list_view.adapter as CookDataAdapter).notifyDataSetChanged()
                 }

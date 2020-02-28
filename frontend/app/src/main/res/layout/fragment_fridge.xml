@@ -5,6 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ProgressBar
+        android:id="@+id/ingredients_progress_bar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/items_list_view"
+        app:layout_constraintStart_toStartOf="@+id/items_list_view"
+        app:layout_constraintTop_toTopOf="@+id/items_list_view" />
+
     <SearchView
         android:id="@+id/items_search_view"
         android:layout_width="0dp"
@@ -62,7 +71,9 @@
         app:layout_constraintBottom_toTopOf="@+id/add_items_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/items_search_view" />
+        app:layout_constraintTop_toBottomOf="@+id/items_search_view" >
+
+    </ListView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

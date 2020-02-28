@@ -11,4 +11,8 @@ class RecipeRepository @Inject constructor(private val recipeService: RecipeServ
     fun getAllRecipes(): Call<ArrayList<Recipe>> {
         return recipeService.getAllRecipes()
     }
+
+    fun rateRecipe(recipeId: Int, userId: Int, isLike: Boolean): Call<Recipe>{
+        return recipeService.rateRecipe(recipeId, userId, if(isLike) "like" else "dislike")
+    }
 }

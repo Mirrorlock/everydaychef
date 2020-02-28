@@ -1,13 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="250sp"
-    android:layout_gravity="center_horizontal"
-    card_view:cardCornerRadius="4dp">
+    android:layout_height="350sp"
+    android:background="@android:drawable/dialog_holo_light_frame"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:id="@+id/recipe_image_cover"
+        android:layout_width="match_parent"
+        android:layout_height="270dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/recipe_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/recipe_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/black_transparent"
+            android:fontFamily="cursive"
+            android:padding="10dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/big_text"
+            android:typeface="serif" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/recipe_like_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/heart_off"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/recipe_name"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</android.support.v7.widget.CardView>
+        android:id="@+id/recipe_likes_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="20dp"
+        android:layout_toStartOf="@id/recipe_like_button"
+        android:text="0"
+        app:layout_constraintBottom_toBottomOf="@+id/recipe_like_button"
+        app:layout_constraintEnd_toStartOf="@+id/recipe_like_button"
+        app:layout_constraintTop_toTopOf="@+id/recipe_like_button" />
+
+    <TextView
+        android:id="@+id/recipe_author_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Temp Person"
+        android:textSize="@dimen/medium_text"
+        app:layout_constraintBottom_toBottomOf="@+id/author_name_tag"
+        app:layout_constraintStart_toEndOf="@+id/author_name_tag"
+        app:layout_constraintTop_toTopOf="@+id/author_name_tag" />
+
+    <TextView
+        android:id="@+id/author_name_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Author: "
+        android:textSize="@dimen/extra_small_text"
+        app:layout_constraintBottom_toBottomOf="@+id/recipe_likes_number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/recipe_likes_number"
+        app:layout_constraintVertical_bias="0.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import com.everydaychef.main.helpers.CallbackUtility
 import com.everydaychef.main.helpers.MessageUtility
 import com.everydaychef.main.models.Family
 import com.everydaychef.main.models.Ingredient
+import com.everydaychef.main.models.Recipe
 import com.everydaychef.main.models.User
 import com.everydaychef.main.services.FamilyService
 import kotlinx.coroutines.async
@@ -155,6 +156,10 @@ class FamilyRepository @Inject constructor(private val familyService: FamilyServ
             }
 
         })
+    }
+
+    fun getRecommendedRecipes(familyId: Int): Call<ArrayList<Recipe>>{
+        return familyService.getRecommendedRecipes(familyId)
     }
 
 }

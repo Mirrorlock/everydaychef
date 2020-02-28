@@ -27,7 +27,7 @@ class CallbackUtility<T> constructor(private val callerFuncName: String,
                 if(successMessage.isNotEmpty())
                 messageUtility.setMessage(successMessage)
             }else{
-                messageUtility.setMessage("Error in server!")
+                messageUtility.setMessage("Error!")
             }
         }else{
             messageUtility.setMessage("Error in server!")

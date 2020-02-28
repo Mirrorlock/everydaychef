@@ -45,18 +45,13 @@ class FridgeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         fridgeViewModel.getFamilyIngredients()
         messageUtility.subscribe(this)
-//        fridgeViewModel.message.observe(viewLifecycleOwner, Observer {
-//            if(it.isNotEmpty()){
-//                popupUtility.displayShortDefault(it)
-//                fridgeViewModel.message.value = ""
-//            }
-//        })
         add_items_button.setOnClickListener {
             addItems()
         }
         fridgeViewModel.familyIngredients.observe(viewLifecycleOwner, Observer {
             if (context != null) {
                 if (items_list_view.adapter == null) {
+                    ingredients_progress_bar.visibility = View.GONE
                     Log.println(Log.DEBUG, "PRINT", "Setting adapter: " + it)
                     items_list_view.adapter = IngredientsAdapter(context!!, -1,it, fridgeViewModel)
                 } else {
@@ -76,7 +71,7 @@ class FridgeFragment : Fragment() {
             { dialog, which, isChecked ->
                 if(isChecked) checkedItems.add(which)
                 else checkedItems.remove(which)
-            }.setPositiveButton("Add Members"){ dialog, which ->
+            }.setPositiveButton("Add Ingredients"){ dialog, which ->
                 fridgeViewModel.addItems(checkedItems)
             }.setNeutralButton("Cancel"){dialog, which -> }
             .create().show()

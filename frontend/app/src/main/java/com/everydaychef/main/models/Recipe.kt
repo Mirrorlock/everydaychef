@@ -22,6 +22,10 @@ class Recipe {
     @SerializedName("creator")
     var creator: User? = null
 
+    @SerializedName("likes")
+    var likedUsers: List<User> = ArrayList()
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
