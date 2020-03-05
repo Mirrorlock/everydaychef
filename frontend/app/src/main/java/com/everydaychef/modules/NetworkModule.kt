@@ -1,9 +1,7 @@
 package com.everydaychef.modules
 
-import com.everydaychef.main.services.FamilyService
-import com.everydaychef.main.services.IngredientService
-import com.everydaychef.main.services.RecipeService
-import com.everydaychef.main.services.UserService
+import com.everydaychef.EverydayChefApplication
+import com.everydaychef.main.services.*
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -20,8 +18,7 @@ class NetworkModule{
         .build();
 
     private val retrofit = Retrofit.Builder()
-//        .baseUrl("https://everydaychef.home.kutiika.net/")
-        .baseUrl("http://192.168.1.2/")
+        .baseUrl(EverydayChefApplication.API_BASE_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -44,5 +41,10 @@ class NetworkModule{
     @Provides
     fun provideRecipeService(): RecipeService {
         return retrofit.create(RecipeService::class.java)
+    }
+
+    @Provides
+    fun provideShoppingListService(): ShoppingListService {
+        return retrofit.create(ShoppingListService::class.java)
     }
 }

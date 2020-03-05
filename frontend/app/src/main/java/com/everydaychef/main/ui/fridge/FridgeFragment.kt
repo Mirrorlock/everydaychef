@@ -13,7 +13,6 @@ import com.everydaychef.EverydayChefApplication
 import com.everydaychef.R
 import com.everydaychef.main.helpers.MessageUtility
 import com.everydaychef.main.helpers.PopupUtility
-import com.everydaychef.main.models.Ingredient
 import kotlinx.android.synthetic.main.fragment_fridge.*
 import javax.inject.Inject
 
@@ -52,28 +51,39 @@ class FridgeFragment : Fragment() {
             if (context != null) {
                 if (items_list_view.adapter == null) {
                     ingredients_progress_bar.visibility = View.GONE
-                    Log.println(Log.DEBUG, "PRINT", "Setting adapter: " + it)
-                    items_list_view.adapter = IngredientsAdapter(context!!, -1,it, fridgeViewModel)
+                    Log.println(Log.DEBUG, "PRINT", "Setting adapter: $it")
+                    items_list_view.adapter = IngredientDataAdapter(context!!, R.layout.row_item,it)
+                    { currentItem ->
+                        fridgeViewModel.deleteIngredient(fridgeViewModel.currentUser!!.user.family.id,
+                            currentItem)
+                    }
+
                 } else {
                     Log.println(Log.DEBUG, "PRINT", "Notifying dataset changed with " + it)
-                    (items_list_view.adapter as IngredientsAdapter).notifyDataSetChanged()
+                    (items_list_view.adapter as IngredientDataAdapter).notifyDataSetChanged()
                 }
             }
         })
     }
 
     private fun addItems() {
-        var items = fridgeViewModel.getAllOtherIngredients()
-        var checkedItems = ArrayList<Int>()
-        AlertDialog.Builder(activity)
-            .setTitle("Add ingredients")
-            .setMultiChoiceItems(items,  null)
-            { dialog, which, isChecked ->
-                if(isChecked) checkedItems.add(which)
-                else checkedItems.remove(which)
-            }.setPositiveButton("Add Ingredients"){ dialog, which ->
-                fridgeViewModel.addItems(checkedItems)
-            }.setNeutralButton("Cancel"){dialog, which -> }
-            .create().show()
+        fridgeViewModel.getAllOtherIngredients()
+        fridgeViewModel.allOtherIngredients.observe(viewLifecycleOwner, Observer {
+            if(fridgeViewModel.receivedOtherIngredients){
+                var items = it.map { ingredient -> ingredient.name }.toTypedArray()
+                var checkedItems = ArrayList<Int>()
+                AlertDialog.Builder(activity)
+                    .setTitle("Add ingredients")
+                    .setMultiChoiceItems(items,  null)
+                    { dialog, which, isChecked ->
+                        if(isChecked) checkedItems.add(which)
+                        else checkedItems.remove(which)
+                    }.setPositiveButton("Add Ingredients"){ dialog, which ->
+                        fridgeViewModel.addItems(checkedItems)
+                    }.setNeutralButton("Cancel"){dialog, which -> }
+                    .create().show()
+                fridgeViewModel.receivedOtherIngredients = false
+            }
+        })
     }
 }

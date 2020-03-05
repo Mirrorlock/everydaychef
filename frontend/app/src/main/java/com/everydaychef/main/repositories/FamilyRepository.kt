@@ -5,10 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.everydaychef.auth.CurrentUser
 import com.everydaychef.main.helpers.CallbackUtility
 import com.everydaychef.main.helpers.MessageUtility
-import com.everydaychef.main.models.Family
-import com.everydaychef.main.models.Ingredient
-import com.everydaychef.main.models.Recipe
-import com.everydaychef.main.models.User
+import com.everydaychef.main.models.*
 import com.everydaychef.main.services.FamilyService
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -77,30 +74,6 @@ class FamilyRepository @Inject constructor(private val familyService: FamilyServ
         familyService.deleteIngredient(familyId, ingredientId)
             .enqueue(CallbackUtility("deleteIngredient", "Item deleted successfully!",
                 messageUtility){})
-
-        /*.enqueue(object: Callback<ArrayList<Ingredient>>{
-            override fun onFailure(call: Call<ArrayList<Ingredient>>?, t: Throwable?) {
-                Log.println(Log.DEBUG, "PRINT", "Error in deleteIngredient(): " + t.toString())
-                Log.println(Log.ERROR, "process_create_family", "Error in deleteIngredient(): "
-                        + t.toString())
-            }
-
-            override fun onResponse(
-                call: Call<ArrayList<Ingredient>>?,
-                response: Response<ArrayList<Ingredient>>?
-            ) {
-                if (response != null) {
-                    if(response.isSuccessful){
-                        messageUtility.setMessage("Success!")
-                    }else{
-                        message.value = "Error in server!"
-                    }
-                }else{
-                    message.value = "There was an Error"
-                }
-            }*/
-
-//        })
     }
 
     fun getFamilyIngredients(familyId: Int, ingredients: MutableLiveData<ArrayList<Ingredient>>,
@@ -129,6 +102,11 @@ class FamilyRepository @Inject constructor(private val familyService: FamilyServ
 
         })
     }
+
+    fun getShoppingLists(familyId: Int): Call<List<ShoppingList>>{
+        return familyService.getShoppingLists(familyId)
+    }
+
 
 
 

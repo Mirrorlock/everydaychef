@@ -1,15 +1,19 @@
 package com.everydaychef.main.ui.home
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.everydaychef.EverydayChefApplication
 import com.everydaychef.R
 import com.everydaychef.auth.AuthViewModel
+import com.everydaychef.main.ui.recipe.new_recipe.NewRecipeFragment
+import kotlinx.android.synthetic.main.fragment_home.*
 import javax.inject.Inject
 
 class HomeFragment : Fragment(), View.OnClickListener {
@@ -23,8 +27,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_home, container, false)
-        return root
+        return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
     override fun onAttach(context: Context) {
@@ -36,11 +39,8 @@ class HomeFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity?.let{
-//            loginViewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
-//            loginViewModel?.authenticationState?.observe(viewLifecycleOwner, Observer {
-//                updateHomeUI()
-//            })
+        btn_go_to_create_recipe.setOnClickListener{
+            findNavController().navigate(R.id.fragment_new_recipe)
         }
     }
 

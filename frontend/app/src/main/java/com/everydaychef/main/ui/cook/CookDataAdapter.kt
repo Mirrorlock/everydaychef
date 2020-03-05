@@ -12,11 +12,15 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.everydaychef.EverydayChefApplication
 import com.everydaychef.R
+import com.everydaychef.main.helpers.ImageUtility
 import com.everydaychef.main.helpers.ViewHolder
 import com.everydaychef.main.models.Recipe
+import com.everydaychef.main.ui.recipe.RecipeFragmentDirections
 import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.android.synthetic.main.row_recipe.view.*
+import retrofit2.Retrofit
 
 
 class CookDataAdapter(context: Context,
@@ -33,15 +37,19 @@ class CookDataAdapter(context: Context,
             convertView
         }
         val recipe = objects[position]
+        var pictureUrl = recipe.picture_url
+
+        ImageUtility.parseImage(pictureUrl, rowView.recipe_image, context)
+
         rowView.recipe_name.text = recipe.name
         rowView.recipe_author_name.text = recipe.creator?.name ?: ""
         rowView.recipe_likes_number.text = recipe.number_of_likes.toString()
         rowView.recipe_image.setOnClickListener {
-//            it.findNavController().navigate()
-//            (context as Fragment).findNavController().navigate()
+            val action = CookFragmentDirections.actionNavCookToRecipeFragment(position)
+            (context as Activity).findNavController(R.id.nav_host_fragment).navigate(action)
         }
         val hasUserLiked = viewModel.hasUserLiked(recipe)
-        
+
         if(hasUserLiked) {
             rowView.recipe_like_button.setImageResource(R.drawable.heart_on)
         }else{
@@ -50,12 +58,7 @@ class CookDataAdapter(context: Context,
         rowView.recipe_like_button.setOnClickListener {
             viewModel.rateRecipe(recipe, rowView.recipe_like_button, !viewModel.hasUserLiked(recipe), position)
         }
-        val pictureUrl = recipe.picture_url
-        if(pictureUrl.length > 3) {
-            Glide.with(context)
-                .load(pictureUrl)
-                .into(rowView.recipe_image)
-        }
+
         return rowView
     }
 

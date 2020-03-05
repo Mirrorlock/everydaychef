@@ -25,6 +25,8 @@ class Recipe {
     @SerializedName("likes")
     var likedUsers: List<User> = ArrayList()
 
+    @SerializedName("ingredients")
+    var ingredients: List<Ingredient>  = ArrayList()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -51,7 +53,7 @@ class Recipe {
     }
 
     override fun toString(): String {
-        return "Recipe(id=$id, name='$name', description='$description', picture_url='$picture_url', number_of_likes=$number_of_likes)"
+        return "Recipe(id=$id, name='$name', description='$description', picture_url='$picture_url', number_of_likes=$number_of_likes, ingredients=$ingredients)"
     }
 
 

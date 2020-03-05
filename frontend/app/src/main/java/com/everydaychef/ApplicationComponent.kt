@@ -8,6 +8,9 @@ import com.everydaychef.main.ui.fridge.FridgeFragment
 import com.everydaychef.main.ui.home.HomeFragment
 import com.everydaychef.main.ui.notifications.NotificationsFragment
 import com.everydaychef.main.ui.profile.ProfileFragment
+import com.everydaychef.main.ui.recipe.RecipeFragment
+import com.everydaychef.main.ui.recipe.new_recipe.NewRecipeFragment
+import com.everydaychef.main.ui.shopping_list.ShoppingListFragment
 import com.everydaychef.modules.AppModule
 import com.everydaychef.modules.NetworkModule
 import dagger.Component
@@ -24,4 +27,7 @@ interface ApplicationComponent {
     fun inject(fragment: NotificationsFragment)
     fun inject(fragment: FridgeFragment)
     fun inject(fragment: CookFragment)
+    fun inject(fragment: RecipeFragment)
+    fun inject(fragment: NewRecipeFragment)
+    fun inject(fragment: ShoppingListFragment)
 }

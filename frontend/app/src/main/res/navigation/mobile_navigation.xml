@@ -28,11 +28,35 @@
         android:id="@+id/nav_cook"
         android:name="com.everydaychef.main.ui.cook.CookFragment"
         android:label="@string/menu_cook"
-        tools:layout="@layout/fragment_cook" />
+        tools:layout="@layout/fragment_cook" >
+        <action
+            android:id="@+id/action_nav_cook_to_recipe_fragment"
+            app:destination="@id/recipe_fragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit">
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipe_fragment"
+        android:name="com.everydaychef.main.ui.recipe.RecipeFragment"
+        tools:layout="@layout/fragment_recipe">
+        <argument
+            android:name="recipeIndex"
+            app:argType="integer" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/fragment_new_recipe"
+        android:name="com.everydaychef.main.ui.recipe.new_recipe.NewRecipeFragment"
+        android:label="New Recipe"
+        tools:layout="@layout/fragment_new_recipe" >
+    </fragment>
 
     <fragment
         android:id="@+id/nav_shopping_list"
-        android:name="com.everydaychef.main.ui.tools.ToolsFragment"
+        android:name="com.everydaychef.main.ui.shopping_list.ShoppingListFragment"
         android:label="@string/menu_shopping_list"
         tools:layout="@layout/fragment_shopping_list" />
 

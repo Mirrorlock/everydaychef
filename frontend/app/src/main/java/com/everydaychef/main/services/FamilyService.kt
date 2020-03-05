@@ -1,9 +1,6 @@
 package com.everydaychef.main.services
 
-import com.everydaychef.main.models.Family
-import com.everydaychef.main.models.Ingredient
-import com.everydaychef.main.models.Recipe
-import com.everydaychef.main.models.User
+import com.everydaychef.main.models.*
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -32,4 +29,7 @@ interface FamilyService {
     @DELETE("family/{familyId}/ingredients/{ingredientId}")
     fun deleteIngredient(@Path("familyId") familyId: Int,
                          @Path("ingredientId") ingredientId: Int): Call<ArrayList<Ingredient>>
+
+    @GET("family/{id}/shopping_lists")
+    fun getShoppingLists(@Path("id") familyId: Int): Call<List<ShoppingList>>
 }
