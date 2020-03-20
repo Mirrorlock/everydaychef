@@ -15,7 +15,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.everydaychef.EverydayChefApplication
 import com.everydaychef.R
 import com.everydaychef.main.helpers.ImageUtility
-import com.everydaychef.main.helpers.ViewHolder
 import com.everydaychef.main.models.Recipe
 import com.everydaychef.main.ui.recipe.RecipeFragmentDirections
 import kotlinx.android.synthetic.main.nav_header_main.*

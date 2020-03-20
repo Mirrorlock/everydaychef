@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.everydaychef.auth.AuthenticationState
 import com.everydaychef.auth.CurrentUser
+import com.everydaychef.main.helpers.SharedPreferencesUtility
 import com.everydaychef.main.models.Family
 import com.everydaychef.main.services.UserService
 import com.everydaychef.main.models.User
@@ -25,24 +26,19 @@ import javax.inject.Singleton
 
 
 @Singleton
-class UserRepository @Inject constructor (private val userService: UserService){
+class UserRepository @Inject constructor (private val userService: UserService,
+                                          private val sharedPreferencesUtility: SharedPreferencesUtility){
 
     companion object{
-//        val authSharedPref = "AuthSharedPreferences"
-        var token = ""
-        var method = ""
+        const val authSharedPref = "AuthSharedPreferences"
     }
 
     var currentUserLd = MutableLiveData<CurrentUser>()
         private set
-
     var googleSignInClient: GoogleSignInClient? = null
-
     val userSignedIn: Boolean
         get() = currentUserLd.value != null
-
     var authenticationState = MutableLiveData<AuthenticationState>()
-
     var errorMessage: String = ""
 
     init{
@@ -66,20 +62,9 @@ class UserRepository @Inject constructor (private val userService: UserService){
         }
     }
 
-//    fun setCurrentUser(username: String, accessToken: String){
-//        userService
-//        currentUserLd.value?.username = username //temp
-//    }
-
-
-    fun storeCurrentUser( authToken: String, authMethod: String) {
-        token = authToken
-        method = authMethod
-//        var  editor : SharedPreferences.Editor = context.getSharedPreferences(authSharedPref,
-//            Context.MODE_PRIVATE).edit()
-//        editor.putString("token", token)
-//        editor.putString("method", method)
-//        editor.apply()
+    fun storeCurrentUser( token: String, method: String) {
+        sharedPreferencesUtility.setPreference(authSharedPref, "token", token)
+        sharedPreferencesUtility.setPreference(authSharedPref, "method", method)
     }
 
 
@@ -140,8 +125,7 @@ class UserRepository @Inject constructor (private val userService: UserService){
             AuthenticationState.GOOGLE_AUTHENTICATED -> googleSignOut(activity)
             AuthenticationState.FACEBOOK_AUTHENTICATED -> facebookSignOut()
         }
-        token=""
-        method=""
+        storeCurrentUser("", "")
         currentUserLd.value = null
         authenticationState.value =
             AuthenticationState.UNAUTHENTICATED

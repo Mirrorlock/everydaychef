@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.everydaychef.EverydayChefApplication
 import com.everydaychef.main.MainActivity
+import com.everydaychef.main.helpers.SharedPreferencesUtility
 import com.everydaychef.main.repositories.UserRepository
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -14,17 +15,16 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthInterceptor @Inject constructor(): Interceptor {
+class AuthInterceptor @Inject constructor(private val sharedPreferencesUtility: SharedPreferencesUtility)
+    : Interceptor {
     override fun intercept(chain: Interceptor.Chain?): Response {
-//        var context = EverydayChefApplication.mContext
-//        var edit = context!!.getSharedPreferences(UserRepository.authSharedPref, Context.MODE_PRIVATE)
+
         var newRequest = chain!!.request()
-        Log.d("PRINT", "Checking user signed in")
-//        val token: String? = edit.getString("token", "")
-        val token: String? = UserRepository.token
-        if(token != null && token.isNotEmpty()){
-            val method: String = UserRepository.method
-//            val method: String = edit.getString("method", "")!!
+        val token: String = sharedPreferencesUtility
+            .getPreference(UserRepository.authSharedPref, "token")
+        if(token.isNotEmpty()){
+            val method: String = sharedPreferencesUtility
+                .getPreference(UserRepository.authSharedPref, "method")
             Log.d("PRINT", "User signed in! Setting headers!")
             newRequest = newRequest.newBuilder()
                 .addHeader("Authorization",  "Bearer $token")
