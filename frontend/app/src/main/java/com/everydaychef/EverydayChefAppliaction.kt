@@ -9,15 +9,14 @@ class EverydayChefApplication: Application(){
     companion object{
         //        val ApiBaseURL = "https://everydaychef.home.kutiika.net/"
         const val API_BASE_URL = "http://192.168.1.8/"
-//        var mContext: Context? = null
     }
 
-//    override fun onCreate() {
-//        super.onCreate()
-//        mContext = applicationContext
-//    }
+    lateinit var appComponent: ApplicationComponent
 
-    val appComponent = DaggerApplicationComponent.builder()
-        .appModule(AppModule(this))
-        .build()!!
+    override fun onCreate() {
+        super.onCreate()
+        appComponent = DaggerApplicationComponent.builder()
+            .appModule(AppModule(this))
+            .build()
+    }
 }

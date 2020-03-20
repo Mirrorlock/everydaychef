@@ -10,8 +10,11 @@ import com.everydaychef.main.repositories.UserRepository
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AuthInterceptor /*constructor(context: Context)*/: Interceptor {
+@Singleton
+class AuthInterceptor @Inject constructor(): Interceptor {
     override fun intercept(chain: Interceptor.Chain?): Response {
 //        var context = EverydayChefApplication.mContext
 //        var edit = context!!.getSharedPreferences(UserRepository.authSharedPref, Context.MODE_PRIVATE)

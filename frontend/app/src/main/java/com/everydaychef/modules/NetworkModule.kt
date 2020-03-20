@@ -18,41 +18,53 @@ import javax.inject.Inject
 @Module
 class NetworkModule{
 
-    var okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
-        .connectTimeout(120, TimeUnit.SECONDS)
-        .readTimeout(120, TimeUnit.SECONDS)
-        .writeTimeout(120, TimeUnit.SECONDS)
-        .addInterceptor(AuthInterceptor())
-        .build()
-
-    var retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(EverydayChefApplication.API_BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    @Provides
+    fun provideRetrofit(okHttpClient: OkHttpClient, converterFactory: GsonConverterFactory): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(EverydayChefApplication.API_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(converterFactory)
+            .build()
+    }
 
     @Provides
-    fun provideUserService(): UserService {
+    fun provideOkHttpClient(interceptor: AuthInterceptor): OkHttpClient {
+        return OkHttpClient().newBuilder()
+            .connectTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .addInterceptor(interceptor)
+            .build()
+
+    }
+
+    @Provides
+    fun provideConverterFactory(): GsonConverterFactory{
+        return GsonConverterFactory.create()
+    }
+
+    @Provides
+    fun provideUserService(retrofit: Retrofit): UserService {
         return retrofit.create(UserService::class.java)
     }
 
     @Provides
-    fun provideFamilyService(): FamilyService{
+    fun provideFamilyService(retrofit: Retrofit): FamilyService{
         return retrofit.create(FamilyService::class.java)
     }
 
     @Provides
-    fun provideIngredientService(): IngredientService {
+    fun provideIngredientService(retrofit: Retrofit): IngredientService {
         return retrofit.create(IngredientService::class.java)
     }
 
     @Provides
-    fun provideRecipeService(): RecipeService {
+    fun provideRecipeService(retrofit: Retrofit): RecipeService {
         return retrofit.create(RecipeService::class.java)
     }
 
     @Provides
-    fun provideShoppingListService(): ShoppingListService {
+    fun provideShoppingListService(retrofit: Retrofit): ShoppingListService {
         return retrofit.create(ShoppingListService::class.java)
     }
 }

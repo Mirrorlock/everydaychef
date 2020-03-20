@@ -12,7 +12,6 @@ import javax.inject.Singleton
 class PermissionsUtility @Inject constructor(private val messageUtility: MessageUtility){
     val RC_STORAGE_PERMISSION = 10
 
-
     fun checkForStoragePermission(activity: Activity): Boolean{
         return if (ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
