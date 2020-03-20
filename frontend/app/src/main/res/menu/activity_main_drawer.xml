@@ -10,15 +10,15 @@
             android:title="@string/menu_profile" />
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/chef"
             android:title="@string/menu_home" />
         <item
             android:id="@+id/nav_fridge"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/fridge"
             android:title="@string/menu_fridge" />
         <item
             android:id="@+id/nav_cook"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/cook_dark"
             android:title="@string/menu_cook" />
         <item
             android:id="@+id/nav_shopping_list"

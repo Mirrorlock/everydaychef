@@ -60,22 +60,17 @@ class LoginActivity : AppCompatActivity() {
                 val task =
                     GoogleSignIn.getSignedInAccountFromIntent(data)
                 handleGoogleSignInResult(task)
-//                startMainActivity()
-//                popupUtility.displayShortTop("Successfully logged in as: " + authViewModel.email.value)
             }
             authViewModel.RC_FACEBOOK_SIGN_IN -> {
                 authViewModel.facebookCallbackManager
                     .onActivityResult(requestCode, resultCode, data)
-//                startMainActivity()
-
-//                popupUtility.displayShortTop("Successfully logged in as: " + authViewModel.email.value)
             }
         }
     }
 
     private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
         try {
-            authViewModel.googleSignInSuccessful(completedTask!!.result!!)
+            authViewModel.googleSignInSuccessful(completedTask!!.result!!, applicationContext!!)
         } catch (e: ApiException) {
             Log.println(Log.ERROR, "GOOGLE-SIGN-IN", e.printStackTrace().toString())
         }

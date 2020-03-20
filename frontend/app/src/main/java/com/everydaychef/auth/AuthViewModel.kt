@@ -8,6 +8,9 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.everydaychef.R
+import com.everydaychef.main.helpers.CallbackUtility
+import com.everydaychef.main.helpers.MessageUtility
+import com.everydaychef.main.models.helper_models.JwtResponse
 import com.everydaychef.main.repositories.UserRepository
 import com.facebook.*
 import com.facebook.login.LoginManager
@@ -18,9 +21,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
+import com.google.gson.JsonObject
 import org.json.JSONException
 import javax.inject.Inject
-class AuthViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
+class AuthViewModel @Inject constructor(private val userRepository: UserRepository,
+                                        private val messageUtility: MessageUtility) : ViewModel() {
     val errorMessage: String
         get() = userRepository.errorMessage
 
@@ -37,7 +42,13 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
     fun manuallySignIn(username: String, password: String) {
 //        val accessToken = userRepository.passwordIsValidForUsername(username, password)
 //        if (accessToken.isNotEmpty()) {
-        userRepository.setCurrentUser(username = username)
+        userRepository.authenticateUser(username, password)
+            .enqueue(CallbackUtility<JwtResponse>("manuallySignOut",
+                messageUtility = messageUtility){
+                Log.d("PRINT", "Received response: ${it.jwtToken}")
+                userRepository.storeCurrentUser(it.jwtToken, "Manual")
+                userRepository.setCurrentUser(username = username)
+            })
     }
     // MANUAL AUTHENTICATION //
 
@@ -63,17 +74,16 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
         activity.startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
     }
 
-    fun googleSignInSuccessful(googleUser: GoogleSignInAccount) {
+    fun googleSignInSuccessful(googleUser: GoogleSignInAccount, context: Context) {
         currentGoogleUser = googleUser
+        userRepository.storeCurrentUser( currentGoogleUser!!.idToken.toString(), "Google")
         fillDataFromGoogleAccount()
-        Log.println(Log.DEBUG, "PRINT", "Id token is: " + googleUser.idToken)
+
     }
 
     fun fillDataFromGoogleAccount() {
-        Log.println(Log.DEBUG, "PRINT", "We are here!")
         userRepository.setCurrentUser(
             username    = currentGoogleUser?.displayName.toString(),
-            accessToken = currentGoogleUser?.idToken.toString(),
             email       = currentGoogleUser?.email.toString(),
             method      = "google",
             photoUrl    = currentGoogleUser?.photoUrl.toString()
@@ -103,6 +113,7 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
         button.registerCallback(facebookCallbackManager, object : FacebookCallback<LoginResult?> {
             override fun onSuccess(loginResult: LoginResult?) { // App code
                 Log.println(Log.INFO, "FACEBOOK-AUTH", "Facebook auth successful!")
+                Log.d("PRINT", "Facebook id token is: " + loginResult!!.accessToken.token)
                 loginResult?.accessToken?.let { fillDataFromFacebookAccount(it) }
             }
 
@@ -128,9 +139,9 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
                 val image =
                     `object`.getJSONObject("picture").getJSONObject("data").getString("url")
                 Log.println(Log.DEBUG, "PRINT", "$name with $email and imageURL: $image")
+                userRepository.storeCurrentUser(accessToken.token, "Facebook")
                 userRepository.setCurrentUser(
                     username = name,
-                    accessToken = accessToken.token,
                     email = email,
                     method = "facebook",
                     photoUrl = image

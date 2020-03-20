@@ -1,6 +1,8 @@
 package com.everydaychef.main.repositories
 
 import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.everydaychef.auth.AuthenticationState
@@ -8,10 +10,13 @@ import com.everydaychef.auth.CurrentUser
 import com.everydaychef.main.models.Family
 import com.everydaychef.main.services.UserService
 import com.everydaychef.main.models.User
+import com.everydaychef.main.models.helper_models.JwtResponse
 import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
+import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.register.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,6 +26,13 @@ import javax.inject.Singleton
 
 @Singleton
 class UserRepository @Inject constructor (private val userService: UserService){
+
+    companion object{
+//        val authSharedPref = "AuthSharedPreferences"
+        var token = ""
+        var method = ""
+    }
+
     var currentUserLd = MutableLiveData<CurrentUser>()
         private set
 
@@ -59,7 +71,26 @@ class UserRepository @Inject constructor (private val userService: UserService){
 //        currentUserLd.value?.username = username //temp
 //    }
 
-    fun setCurrentUser(username: String, email: String = "", accessToken: String = "", photoUrl: String = "", method: String = "manual"){
+
+    fun storeCurrentUser( authToken: String, authMethod: String) {
+        token = authToken
+        method = authMethod
+//        var  editor : SharedPreferences.Editor = context.getSharedPreferences(authSharedPref,
+//            Context.MODE_PRIVATE).edit()
+//        editor.putString("token", token)
+//        editor.putString("method", method)
+//        editor.apply()
+    }
+
+
+    fun authenticateUser(username: String, password: String) : Call<JwtResponse>{
+        var body = hashMapOf("username" to username, "password" to password)
+        return userService.authenticate(body)
+    }
+
+    fun setCurrentUser(username: String, email: String = "",
+                       photoUrl: String = "", method: String = "manual"){
+
         userService.getUserByUsername(username).enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
                 Log.println(Log.ERROR, "Process Authenticate", t.toString())
@@ -70,20 +101,12 @@ class UserRepository @Inject constructor (private val userService: UserService){
                 when {
                     response?.code() == 200 -> {
                             Log.println(Log.DEBUG, "PRINT", "found user: " + body)
-                            fillUserFromBody(body!!, photoUrl, accessToken)
+                            fillUserFromBody(body!!, photoUrl)
                             setUserAuthenticationState(method)
                     }
                     response?.code() == 404 -> {
                         if (method != "manual") {
-                            registerWithMethod(username, email, method, photoUrl, accessToken)
-//                                val user = userService.create(
-//                                    username, email = email,
-//                                    authenticationMethod = method.first()
-//                                ).execute()
-//                                if(user.code() == 200){
-//                                    val foundUser = user.body() as User
-//                                    fillUserFromBody(foundUser, photoUrl, accessToken)
-//                                }
+                            registerWithMethod(username, email, method, photoUrl)
                         } else {
                             setUserAuthenticationState("invalid")
                         }
@@ -98,14 +121,13 @@ class UserRepository @Inject constructor (private val userService: UserService){
         })
     }
 
-    private fun fillUserFromBody(body: User, photoUrl: String, accessToken: String){
+    private fun fillUserFromBody(body: User, photoUrl: String){
         currentUserLd.value = CurrentUser()
         currentUserLd.value!!.user = body
-        currentUserLd.value!!.id = body!!.id
+        currentUserLd.value!!.id = body.id
         currentUserLd.value!!.username = body.name
         currentUserLd.value!!.email = body.email
         currentUserLd.value!!.photoUrl = photoUrl
-        currentUserLd.value!!.token = accessToken
     }
 
      fun setGoogleClient(googleSignInClient: GoogleSignInClient?) {
@@ -118,6 +140,8 @@ class UserRepository @Inject constructor (private val userService: UserService){
             AuthenticationState.GOOGLE_AUTHENTICATED -> googleSignOut(activity)
             AuthenticationState.FACEBOOK_AUTHENTICATED -> facebookSignOut()
         }
+        token=""
+        method=""
         currentUserLd.value = null
         authenticationState.value =
             AuthenticationState.UNAUTHENTICATED
@@ -157,7 +181,7 @@ class UserRepository @Inject constructor (private val userService: UserService){
             override fun onResponse(call: Call<Any>?, response: Response<Any>?) {
                 if(response?.code() == 200){
                     val user: User = response.body() as User
-                    fillUserFromBody(user, "",  "")
+                    fillUserFromBody(user, "")
 //                    currentUserLd.value = response.body() as CurrentUser?
                     setUserAuthenticationState("manual")
                 }else if(response?.code() == 500) {
@@ -173,7 +197,7 @@ class UserRepository @Inject constructor (private val userService: UserService){
     }
 
     fun registerWithMethod(username: String, email: String, method: String,
-                           photoUrl: String, accessToken: String) {
+                           photoUrl: String) {
 //        userService.create(username, email=email,authenticationMethod = method.first())
         val requestBody: HashMap<String, Any> = HashMap<String, Any>()
             requestBody.putAll(mapOf("username" to username,
@@ -189,7 +213,7 @@ class UserRepository @Inject constructor (private val userService: UserService){
                 if(response?.code() == 200){
                     Log.println(Log.DEBUG, "PRINT", "Created user:" + response.body().toString())
                     val user: User = response.body() as User
-                    fillUserFromBody(user, accessToken,  photoUrl)
+                    fillUserFromBody(user,  photoUrl)
                     setUserAuthenticationState(method)
                 }else if(response?.code() == 500) {
                     errorMessage = "Server not responding..."
@@ -234,13 +258,13 @@ class UserRepository @Inject constructor (private val userService: UserService){
 
     fun inviteUserToFamily(userId: Int, familyId: Int, message: MutableLiveData<String>) {
         Log.println(Log.DEBUG, "PRINT", "Inviting user with id $userId to family with id $familyId")
-        userService.inviteUserToFamily(userId, familyId, HashMap()).enqueue(object: Callback<Boolean>{
-            override fun onFailure(call: Call<Boolean>?, t: Throwable?) {
+        userService.inviteUserToFamily(userId, familyId, HashMap()).enqueue(object: Callback<String>{
+            override fun onFailure(call: Call<String>?, t: Throwable?) {
                 Log.println(Log.DEBUG, "PRINT", "Error from inviteUser(): " + t.toString())
                 Log.println(Log.ERROR, "process_invite_user", "Error from inviteUser(): " + t.toString())
             }
 
-            override fun onResponse(call: Call<Boolean>?, response: Response<Boolean>?) {
+            override fun onResponse(call: Call<String>?, response: Response<String>?) {
                 if (response != null) {
                     if (response.isSuccessful) {
                         message.value = "User invited successfully!"
