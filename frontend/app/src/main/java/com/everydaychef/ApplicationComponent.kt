@@ -3,6 +3,7 @@ package com.everydaychef
 import com.everydaychef.auth.LoginActivity
 import com.everydaychef.auth.RegisterActivity
 import com.everydaychef.main.MainActivity
+import com.everydaychef.main.helpers.firebase_messaging.MessageReceiver
 import com.everydaychef.main.ui.cook.CookFragment
 import com.everydaychef.main.ui.fridge.FridgeFragment
 import com.everydaychef.main.ui.home.HomeFragment
@@ -30,4 +31,5 @@ interface ApplicationComponent {
     fun inject(fragment: RecipeFragment)
     fun inject(fragment: NewRecipeFragment)
     fun inject(fragment: ShoppingListFragment)
+    fun inject(service: MessageReceiver)
 }

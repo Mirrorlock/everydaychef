@@ -40,7 +40,7 @@ class CookViewModel @Inject constructor(private val userRepository: UserReposito
         likeButton.isClickable = false
         recipeRepository.rateRecipe(recipe.id, userRepository.currentUserLd.value!!.id, isLike)
             .enqueue(CallbackUtility<Recipe>("rateRecipe",
-                successMessage, messageUtility){
+                successMessage, messageUtility = messageUtility){
                 if(isLike) likeButton.setImageResource(R.drawable.heart_on)
                 else likeButton.setImageResource(R.drawable.heart_off)
                 likeButton.isClickable = true

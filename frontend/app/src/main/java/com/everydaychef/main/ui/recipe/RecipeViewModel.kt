@@ -33,7 +33,7 @@ class RecipeViewModel @Inject constructor(private val userRepository: UserReposi
         Log.d("PRINT", "Chosen shopping list is: $sl")
         recipeRepository.addToShoppingList(recipe.id, sl!!.id)
             .enqueue(CallbackUtility<Any>("addToShoppingList",
-                "Ingredients added to list!", messageUtility){})
+                "Ingredients added to list!", messageUtility = messageUtility){})
     }
 
     fun getShoppingLists() {

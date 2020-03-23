@@ -25,32 +25,14 @@ class FamilyRepository @Inject constructor(private val familyService: FamilyServ
                      message: MutableLiveData<String>) {
         familyService.changeUserFamily(currentUser.value!!.id, familyName)
             .enqueue(CallbackUtility<Family>("createFamily",
-                "Family created successfully!", messageUtility){family ->
+                "Family created successfully!",
+                errorMessage = "Family with this name exists!", messageUtility =  messageUtility){family ->
                 val newCurrentUser: CurrentUser = currentUser.value!!
+                Log.d("PRINT", "Setting new family: $family to user")
                 newCurrentUser.user.family = family
                 currentUser.value = newCurrentUser
             })
-
-       /* .enqueue(object : Callback<Family> {
-            override fun onFailure(call: Call<Family>?, t: Throwable?) {
-                Log.println(Log.DEBUG, "PRINT", "Error in createFamily(): " + t.toString())
-                Log.println(Log.ERROR, "process_create_family", "Error in createFamily(): "
-                        + t.toString())
-            }
-
-            override fun onResponse(call: Call<Family>?, response: Response<Family>?) {
-                if(response?.code() == 200) {
-                    Log.println(Log.DEBUG, "PRINT", "Returned response for create fam: " +
-                            response.body().toString())
-                    val newCurrentUser: CurrentUser = currentUser.value!!
-                    newCurrentUser.user.family = response.body()
-                    currentUser.value = newCurrentUser
-                }else{
-                    message.value = "There was an error!"
-                }
-            }
-        })*/
-    }
+        }
 
     fun getNonMembers(familyId: Int, message: MutableLiveData<String>): ArrayList<User>{
         var uninvitedUsers = ArrayList<User>()
@@ -73,7 +55,7 @@ class FamilyRepository @Inject constructor(private val familyService: FamilyServ
                          message: MutableLiveData<String>){
         familyService.deleteIngredient(familyId, ingredientId)
             .enqueue(CallbackUtility("deleteIngredient", "Item deleted successfully!",
-                messageUtility){})
+                messageUtility = messageUtility){})
     }
 
     fun getFamilyIngredients(familyId: Int, ingredients: MutableLiveData<ArrayList<Ingredient>>,

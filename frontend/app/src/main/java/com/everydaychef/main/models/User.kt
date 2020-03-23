@@ -22,11 +22,14 @@ class User {
     var family: Family =
         Family()
 
+    @SerializedName("devices")
+    var devices: Set<Device> = HashSet()
+
     @SerializedName("invitations")
     var invitations: List<Family>? = null
 
     override fun toString(): String {
-        return "User(id=$id, name='$name', email='$email', password='$password', accountType='$accountType', family=$family, invitations=$invitations)"
+        return "User(id=$id, name='$name', email='$email', password='$password', accountType='$accountType', family=$family, invitations=$invitations, firebase_tokens=${devices?.map { it.toString() }})"
     }
 
     override fun equals(other: Any?): Boolean {

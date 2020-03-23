@@ -21,7 +21,7 @@ interface UserService {
     fun getInvitations(@Path("userId") userId: Int): Call<ArrayList<Family>>
 
     @POST("user")
-    fun create(@Body body: HashMap<String, Any>): Call<Any>
+    fun create(@Body body: HashMap<String, String>): Call<User>
 
     @POST("authenticate")
     fun authenticate(@Body body: HashMap<String, String>): Call<JwtResponse>

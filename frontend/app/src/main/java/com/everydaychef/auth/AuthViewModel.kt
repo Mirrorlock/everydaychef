@@ -29,25 +29,23 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
     val errorMessage: String
         get() = userRepository.errorMessage
 
-    //    var  tempRepository: TempRepository
     val currentUserLd = userRepository.currentUserLd
-    val authenticationState: MutableLiveData<AuthenticationState>
-            = userRepository.authenticationState
-//
+    var authenticationState: MutableLiveData<AuthenticationState>
+        get() = userRepository.authenticationState
+        set(value) {userRepository.authenticationState = value}
+
     fun isUserSignedIn(): Boolean {
         return userRepository.userSignedIn
     }
 
     // MANUAL AUTHENTICATION //
     fun manuallySignIn(username: String, password: String) {
-//        val accessToken = userRepository.passwordIsValidForUsername(username, password)
-//        if (accessToken.isNotEmpty()) {
         userRepository.authenticateUser(username, password)
             .enqueue(CallbackUtility<JwtResponse>("manuallySignOut",
+                errorMessage="Wrong credentials!",
                 messageUtility = messageUtility){
-                Log.d("PRINT", "Received response: ${it.jwtToken}")
-                userRepository.storeCurrentUser(it.jwtToken, "Manual")
-                userRepository.setCurrentUser(username = username)
+//                userRepository.storeCurrentUser(it.jwtToken, "Manual")
+                userRepository.setCurrentUser(username = username, token = it.jwtToken)
             })
     }
     // MANUAL AUTHENTICATION //
@@ -76,17 +74,16 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
 
     fun googleSignInSuccessful(googleUser: GoogleSignInAccount, context: Context) {
         currentGoogleUser = googleUser
-        userRepository.storeCurrentUser( currentGoogleUser!!.idToken.toString(), "Google")
         fillDataFromGoogleAccount()
-
     }
 
     fun fillDataFromGoogleAccount() {
         userRepository.setCurrentUser(
-            username    = currentGoogleUser?.displayName.toString(),
-            email       = currentGoogleUser?.email.toString(),
+            username    = currentGoogleUser!!.displayName.toString(),
+            token       = currentGoogleUser!!.idToken!!,
+            email       = currentGoogleUser!!.email.toString(),
             method      = "google",
-            photoUrl    = currentGoogleUser?.photoUrl.toString()
+            photoUrl    = currentGoogleUser!!.photoUrl.toString()
         )
     }
     // GOOGLE AUTHENTICATION //
@@ -113,7 +110,6 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
         button.registerCallback(facebookCallbackManager, object : FacebookCallback<LoginResult?> {
             override fun onSuccess(loginResult: LoginResult?) { // App code
                 Log.println(Log.INFO, "FACEBOOK-AUTH", "Facebook auth successful!")
-                Log.d("PRINT", "Facebook id token is: " + loginResult!!.accessToken.token)
                 loginResult?.accessToken?.let { fillDataFromFacebookAccount(it) }
             }
 
@@ -139,9 +135,10 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
                 val image =
                     `object`.getJSONObject("picture").getJSONObject("data").getString("url")
                 Log.println(Log.DEBUG, "PRINT", "$name with $email and imageURL: $image")
-                userRepository.storeCurrentUser(accessToken.token, "Facebook")
+//                userRepository.storeCurrentUser(accessToken.token, "Facebook")
                 userRepository.setCurrentUser(
                     username = name,
+                    token = accessToken.token,
                     email = email,
                     method = "facebook",
                     photoUrl = image
@@ -168,7 +165,12 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
     }
 
     fun register(username: String, password: String, email: String) {
-        userRepository.register(username, password, email)
+        userRepository.register(username, password, email, "manual")
+    }
+
+    fun deleteAllUserData(){
+//        userRepository.currentUserLd.value = CurrentUser()
+        userRepository.storeCurrentUser("", "")
     }
 }
 

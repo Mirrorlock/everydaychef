@@ -15,7 +15,7 @@ class NotificationsViewModel @Inject constructor(private val userRepository: Use
     val message = MutableLiveData<String>()
 
     fun getUserInvitations(){
-        userRepository.getInvitaions(invitations, message)
+        userRepository.getInvitations(invitations, message)
     }
 
     fun answerInvitation(inviter: Family, isAccepted: Boolean){

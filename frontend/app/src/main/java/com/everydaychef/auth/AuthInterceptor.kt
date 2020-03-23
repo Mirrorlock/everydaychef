@@ -21,11 +21,10 @@ class AuthInterceptor @Inject constructor(private val sharedPreferencesUtility: 
 
         var newRequest = chain!!.request()
         val token: String = sharedPreferencesUtility
-            .getPreference(UserRepository.authSharedPref, "token")
+            .getPreference(UserRepository.AUTH_SHARED_PREFERENCE, "token")
         if(token.isNotEmpty()){
             val method: String = sharedPreferencesUtility
-                .getPreference(UserRepository.authSharedPref, "method")
-            Log.d("PRINT", "User signed in! Setting headers!")
+                .getPreference(UserRepository.AUTH_SHARED_PREFERENCE, "method")
             newRequest = newRequest.newBuilder()
                 .addHeader("Authorization",  "Bearer $token")
                 .addHeader("AuthenticationMethod", method)

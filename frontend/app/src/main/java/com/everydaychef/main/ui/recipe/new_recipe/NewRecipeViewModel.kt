@@ -33,7 +33,7 @@ class NewRecipeViewModel @Inject constructor(private val recipeRepository: Recip
         recipeRepository.createRecipe(userRepository.currentUserLd.value!!.user.id,
                 recipeName, recipeDescription, selectedImage!!)
             .enqueue(CallbackUtility<Recipe>("createNewRecipe",
-            "Created recipe $recipeName", messageUtility ){
+            "Created recipe $recipeName", messageUtility = messageUtility ){
             Log.d("PRINT", "Created recipe: $it")
             newRecipe.value = it
         })

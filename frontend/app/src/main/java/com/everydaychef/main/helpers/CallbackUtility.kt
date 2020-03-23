@@ -10,6 +10,7 @@ import javax.inject.Inject
 
 class CallbackUtility<T> constructor(private val callerFuncName: String,
                                      private val successMessage: String = "",
+                                     private val errorMessage: String = "",
                                      private val messageUtility: MessageUtility,
                                      private val successFunc: (responseBody: T) -> Unit
                                      ): Callback<T>{
@@ -26,8 +27,11 @@ class CallbackUtility<T> constructor(private val callerFuncName: String,
                 successFunc(response.body())
                 if(successMessage.isNotEmpty())
                 messageUtility.setMessage(successMessage)
+            }else if(response.code() in 401..499){
+                if(errorMessage.isNotEmpty())
+                messageUtility.setMessage(errorMessage)
             }else{
-                messageUtility.setMessage("Error!")
+                messageUtility.setMessage("Error in server!")
             }
         }else{
             messageUtility.setMessage("Error in server!")

@@ -3,6 +3,7 @@ package com.everydaychef.main.helpers
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import javax.inject.Inject
@@ -21,7 +22,7 @@ class PermissionsUtility @Inject constructor(private val messageUtility: Message
                 messageUtility.setMessage("Permission denied!")
             } else {
                 ActivityCompat.requestPermissions(activity,
-                    arrayOf(Manifest.permission.READ_CONTACTS),
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                     RC_STORAGE_PERMISSION)
             }
             false

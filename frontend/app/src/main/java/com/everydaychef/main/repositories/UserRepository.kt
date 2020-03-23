@@ -8,6 +8,10 @@ import androidx.lifecycle.MutableLiveData
 import com.everydaychef.auth.AuthenticationState
 import com.everydaychef.auth.CurrentUser
 import com.everydaychef.main.helpers.SharedPreferencesUtility
+import com.everydaychef.main.helpers.firebase_messaging.InstanceIdService
+import com.everydaychef.main.helpers.firebase_messaging.MessageReceiver.Companion.FIREBASE_SHARED_PREFERENCE
+import com.everydaychef.main.helpers.firebase_messaging.MessageReceiver.Companion.TOKEN_KEY
+import com.everydaychef.main.models.Device
 import com.everydaychef.main.models.Family
 import com.everydaychef.main.services.UserService
 import com.everydaychef.main.models.User
@@ -30,19 +34,19 @@ class UserRepository @Inject constructor (private val userService: UserService,
                                           private val sharedPreferencesUtility: SharedPreferencesUtility){
 
     companion object{
-        const val authSharedPref = "AuthSharedPreferences"
+        const val AUTH_SHARED_PREFERENCE = "AuthSharedPreferences"
     }
 
-    var currentUserLd = MutableLiveData<CurrentUser>()
-        private set
     var googleSignInClient: GoogleSignInClient? = null
-    val userSignedIn: Boolean
-        get() = currentUserLd.value != null
     var authenticationState = MutableLiveData<AuthenticationState>()
     var errorMessage: String = ""
+    var currentUserLd = MutableLiveData<CurrentUser>()
+        private set
+    val userSignedIn: Boolean
+        get() = currentUserLd.value!!.isUserSigned()
 
     init{
-        currentUserLd.value = null
+        currentUserLd.value = CurrentUser()
         authenticationState.value =
             AuthenticationState.UNAUTHENTICATED
     }
@@ -63,8 +67,8 @@ class UserRepository @Inject constructor (private val userService: UserService,
     }
 
     fun storeCurrentUser( token: String, method: String) {
-        sharedPreferencesUtility.setPreference(authSharedPref, "token", token)
-        sharedPreferencesUtility.setPreference(authSharedPref, "method", method)
+        sharedPreferencesUtility.setPreference(AUTH_SHARED_PREFERENCE, "token", token)
+        sharedPreferencesUtility.setPreference(AUTH_SHARED_PREFERENCE, "method", method)
     }
 
 
@@ -73,9 +77,8 @@ class UserRepository @Inject constructor (private val userService: UserService,
         return userService.authenticate(body)
     }
 
-    fun setCurrentUser(username: String, email: String = "",
+    fun setCurrentUser(username: String, token: String, email: String = "",
                        photoUrl: String = "", method: String = "manual"){
-
         userService.getUserByUsername(username).enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>?, t: Throwable?) {
                 Log.println(Log.ERROR, "Process Authenticate", t.toString())
@@ -85,13 +88,15 @@ class UserRepository @Inject constructor (private val userService: UserService,
                 val body = response?.body()
                 when {
                     response?.code() == 200 -> {
-                            Log.println(Log.DEBUG, "PRINT", "found user: " + body)
-                            fillUserFromBody(body!!, photoUrl)
-                            setUserAuthenticationState(method)
+                        Log.println(Log.DEBUG, "PRINT", "found user: $body")
+                        storeCurrentUser( token, method.capitalize())
+                        fillUserFromBody(body!!, photoUrl)
+                        checkDeviceFamiliar(body)
+                        setUserAuthenticationState(method)
                     }
                     response?.code() == 404 -> {
                         if (method != "manual") {
-                            registerWithMethod(username, email, method, photoUrl)
+                            register(username, "", email, method)
                         } else {
                             setUserAuthenticationState("invalid")
                         }
@@ -102,17 +107,24 @@ class UserRepository @Inject constructor (private val userService: UserService,
                 }
                 Log.println(Log.DEBUG, "PRINT", "We got response: " + response?.body())
             }
-
         })
     }
 
+    private fun checkDeviceFamiliar(body: User) {
+        val firebaseToken: String = sharedPreferencesUtility.getPreference(FIREBASE_SHARED_PREFERENCE, TOKEN_KEY)
+        if(!body.devices.map{it.firebaseToken}.contains(firebaseToken)){
+            body.devices = body.devices.plus(Device(firebaseToken))
+//            updateUser(body)
+        }
+    }
+
     private fun fillUserFromBody(body: User, photoUrl: String){
-        currentUserLd.value = CurrentUser()
         currentUserLd.value!!.user = body
         currentUserLd.value!!.id = body.id
         currentUserLd.value!!.username = body.name
         currentUserLd.value!!.email = body.email
         currentUserLd.value!!.photoUrl = photoUrl
+        currentUserLd.value = currentUserLd.value
     }
 
      fun setGoogleClient(googleSignInClient: GoogleSignInClient?) {
@@ -125,8 +137,6 @@ class UserRepository @Inject constructor (private val userService: UserService,
             AuthenticationState.GOOGLE_AUTHENTICATED -> googleSignOut(activity)
             AuthenticationState.FACEBOOK_AUTHENTICATED -> facebookSignOut()
         }
-        storeCurrentUser("", "")
-        currentUserLd.value = null
         authenticationState.value =
             AuthenticationState.UNAUTHENTICATED
 
@@ -136,74 +146,40 @@ class UserRepository @Inject constructor (private val userService: UserService,
         //logout from server
     }
 
-    fun googleSignOut(activity: Activity) {
+    private fun googleSignOut(activity: Activity) {
         Log.println(Log.DEBUG, "PRINT", "Removing google account!")
         googleSignInClient?.signOut()
         googleSignInClient?.revokeAccess()?.addOnCompleteListener(activity, object : OnCompleteListener<Void> {
             override fun onComplete(p0: Task<Void>) {
                 Log.println(Log.DEBUG, "PRINT", "Google is out!")
             }
-
         })
-
     }
-
 
     private fun facebookSignOut() {
         LoginManager.getInstance().logOut()
     }
 
-    fun register(username: String, password: String, email: String) {
-        val requestBody: HashMap<String, Any> = HashMap<String, Any>()
+    fun register(username: String, password: String, email: String,
+                 authenticationMethod: String) {
+        val requestBody: HashMap<String, String> = HashMap()
+        val firebaseToken: String = sharedPreferencesUtility.getPreference(FIREBASE_SHARED_PREFERENCE, TOKEN_KEY)
         requestBody.putAll(mapOf("username" to username,
-            "email" to email, "password" to password))
-        userService.create(requestBody).enqueue(object: Callback<Any>{
-            override fun onFailure(call: Call<Any>?, t: Throwable?) {
+            "email" to email, "password" to password, "authentication_method" to authenticationMethod,
+            "firebase_token" to firebaseToken))
+
+        userService.create(requestBody).enqueue(object: Callback<User>{
+            override fun onFailure(call: Call<User>?, t: Throwable?) {
                 Log.println(Log.ERROR, "Process Register", t.toString())
             }
 
-            override fun onResponse(call: Call<Any>?, response: Response<Any>?) {
+            override fun onResponse(call: Call<User>?, response: Response<User>?) {
                 if(response?.code() == 200){
                     val user: User = response.body() as User
                     fillUserFromBody(user, "")
-//                    currentUserLd.value = response.body() as CurrentUser?
-                    setUserAuthenticationState("manual")
+                    setUserAuthenticationState(authenticationMethod)
                 }else if(response?.code() == 500) {
                     errorMessage = "Server not responding..."
-                    setUserAuthenticationState("invalid")
-                }else{
-                    errorMessage = (response?.body() as String)
-                    setUserAuthenticationState("invalid")
-                }
-            }
-
-        })
-    }
-
-    fun registerWithMethod(username: String, email: String, method: String,
-                           photoUrl: String) {
-//        userService.create(username, email=email,authenticationMethod = method.first())
-        val requestBody: HashMap<String, Any> = HashMap<String, Any>()
-            requestBody.putAll(mapOf("username" to username,
-            "email" to email, "authentication_method" to method))
-
-        userService.create(requestBody)
-            .enqueue(object: Callback<Any>{
-            override fun onFailure(call: Call<Any>?, t: Throwable?) {
-                Log.println(Log.ERROR, "Process Register", t.toString())
-            }
-
-            override fun onResponse(call: Call<Any>?, response: Response<Any>?) {
-                if(response?.code() == 200){
-                    Log.println(Log.DEBUG, "PRINT", "Created user:" + response.body().toString())
-                    val user: User = response.body() as User
-                    fillUserFromBody(user,  photoUrl)
-                    setUserAuthenticationState(method)
-                }else if(response?.code() == 500) {
-                    errorMessage = "Server not responding..."
-                    setUserAuthenticationState("invalid")
-                }else if(response?.code() == 400){
-                    errorMessage = (response.body() as String)
                     setUserAuthenticationState("invalid")
                 }else{
                     setUserAuthenticationState("invalid")
@@ -213,7 +189,7 @@ class UserRepository @Inject constructor (private val userService: UserService,
         })
     }
 
-    fun leaveFamily(/*currentUserLd: MutableLiveData<CurrentUser>,*/ message: MutableLiveData<String>){
+    fun leaveFamily(message: MutableLiveData<String>){
         currentUserLd.value?.let {
             userService.leaveFamily(it.id).enqueue(object : Callback<Family> {
                 override fun onFailure(call: Call<Family>?, t: Throwable?) {
@@ -263,7 +239,7 @@ class UserRepository @Inject constructor (private val userService: UserService,
         })
     }
 
-    fun getInvitaions(invitations: MutableLiveData<ArrayList<Family>>, message: MutableLiveData<String>) {
+    fun getInvitations(invitations: MutableLiveData<ArrayList<Family>>, message: MutableLiveData<String>) {
         userService.getInvitations(currentUserLd.value!!.id).enqueue(object: Callback<ArrayList<Family>>{
             override fun onFailure(call: Call<ArrayList<Family>>?, t: Throwable?) {
                 Log.println(Log.DEBUG, "PRINT", "Error from getInvitations(): " + t.toString())

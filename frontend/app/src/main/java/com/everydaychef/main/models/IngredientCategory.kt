@@ -3,8 +3,8 @@ package com.everydaychef.main.models
 import com.google.gson.annotations.SerializedName
 
 class IngredientCategory{
-    @SerializedName("Id")
-    var Id = 0
+    @SerializedName("id")
+    var id = 0
 
     @SerializedName("name")
     var name: String = ""
@@ -20,7 +20,7 @@ class IngredientCategory{
 
         other as IngredientCategory
 
-        if (Id != other.Id) return false
+        if (id != other.id) return false
         if (name != other.name) return false
         if (pictureUrl != other.pictureUrl) return false
 
@@ -28,14 +28,14 @@ class IngredientCategory{
     }
 
     override fun hashCode(): Int {
-        var result = Id
+        var result = id
         result = 31 * result + name.hashCode()
         result = 31 * result + pictureUrl.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "IngredientCategory(Id=$Id, name='$name', pictureUrl='$pictureUrl')"
+        return "IngredientCategory(Id=$id, name='$name', pictureUrl='$pictureUrl')"
     }
 
 

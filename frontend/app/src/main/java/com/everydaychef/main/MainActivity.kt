@@ -1,5 +1,7 @@
 package com.everydaychef.main
 
+import android.Manifest
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +9,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.Observer
@@ -23,6 +28,7 @@ import com.everydaychef.R
 import com.everydaychef.auth.AuthViewModel
 import com.everydaychef.auth.LoginActivity
 import com.everydaychef.main.helpers.PopupUtility
+import com.everydaychef.main.helpers.firebase_messaging.ChannelsUtility
 import com.everydaychef.main.ui.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -58,13 +64,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
                 R.id.nav_profile
             ), drawer_layout
         )
+
+
+
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
         // DRAWER INITIALISATION //
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
         authenticateUser()
         user_image.setOnClickListener(this)

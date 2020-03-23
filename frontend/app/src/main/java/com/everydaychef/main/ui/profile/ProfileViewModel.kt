@@ -19,7 +19,8 @@ class ProfileViewModel @Inject constructor(private val userRepository: UserRepos
     }
 
     fun createFamily(familyName: String) {
-        familyRepository.createFamily(familyName,getCurrentUser(), message)
+        Log.d("PRINT", "Creating new family with name: $familyName")
+        familyRepository.createFamily(familyName, getCurrentUser(), message)
     }
 
     fun isUserWithDefaultFamily(): Boolean {

@@ -1,9 +1,11 @@
 package com.everydaychef.auth
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
@@ -12,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import com.everydaychef.EverydayChefApplication
 import com.everydaychef.R
+import com.everydaychef.main.helpers.MessageUtility
 import com.everydaychef.main.helpers.PopupUtility
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -25,13 +28,18 @@ class LoginActivity : AppCompatActivity() {
 
     @Inject lateinit var authViewModel: AuthViewModel
     private val popupUtility: PopupUtility = PopupUtility(this)
+    @Inject lateinit var messageUtility: MessageUtility
 
     override fun onCreate(savedInstanceState: Bundle?) {
         (applicationContext as EverydayChefApplication).appComponent.inject(this)
         super.onCreate(savedInstanceState)
+        Log.d("PRINT", "Created LoginActivity!")
         setContentView(R.layout.login)
+        authViewModel.deleteAllUserData()
         setupAuth()
+        messageUtility.subscribe(this)
     }
+
 
     private fun setupAuth(){
         authViewModel.setupFacebookSignIn(facebook_sign_in_button)
@@ -46,7 +54,6 @@ class LoginActivity : AppCompatActivity() {
             }
         })
     }
-
 
     private fun showError(s: String) {
         // TODO: Implement snackbar error!
@@ -109,7 +116,5 @@ class LoginActivity : AppCompatActivity() {
     fun registerOnClick(view: View) {
         startActivity(Intent(this, RegisterActivity::class.java))
     }
-
-
 }
 

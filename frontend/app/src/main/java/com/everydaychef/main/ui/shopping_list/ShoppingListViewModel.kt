@@ -37,11 +37,10 @@ class ShoppingListViewModel @Inject constructor(private val userRepository: User
     }
 
     fun deleteItem(currentItem: Ingredient) {
-        Log.d("PRINT" , "Deleteing: $currentItem")
         shoppingListRepository.deleteIngredient(currentShoppingList.value!!.id, currentItem.id)
             .enqueue(CallbackUtility("deleteItem",
                 "Removed item from ${currentShoppingList.value!!.name}",
-                messageUtility){
+                messageUtility = messageUtility){
                 currentShoppingListIngredients.value = currentShoppingListIngredients.value!!.minus(currentItem)
             })
     }
@@ -52,7 +51,6 @@ class ShoppingListViewModel @Inject constructor(private val userRepository: User
                 messageUtility= messageUtility){
                 var ingredients = it
                     .filter{ingredient -> !currentShoppingListIngredients.value!!.contains(ingredient)}
-                Log.d("PRINT", "All other ingredients: " + ingredients.map{ingredient -> ingredient.name})
                 receivedAllOtherIngredients = true
                 allOtherIngredients.value = ingredients
             })
@@ -64,7 +62,7 @@ class ShoppingListViewModel @Inject constructor(private val userRepository: User
             shoppingListRepository.addItem(currentShoppingList.value!!.id,
                 ingredient.id)
                 .enqueue(CallbackUtility<List<Ingredient>>("addItems",
-                    "Successfully added items", messageUtility){
+                    "Successfully added items", messageUtility = messageUtility){
                     currentShoppingListIngredients.value = currentShoppingListIngredients.value!!.plus(ingredient)
                 })
         }
@@ -85,7 +83,7 @@ class ShoppingListViewModel @Inject constructor(private val userRepository: User
     fun createShoppingList(name: String) {
         shoppingListRepository.create(userRepository.currentUserLd.value!!.user.family.id, name)
             .enqueue(CallbackUtility<ShoppingList>("createShoppingListName",
-                "Created new shopping list!", messageUtility){
+                "Created new shopping list!", messageUtility=messageUtility){
                 shoppingLists.value = shoppingLists.value!!.plus(it)
                 changeCurrentShoppingList(it)
             })
@@ -96,7 +94,7 @@ class ShoppingListViewModel @Inject constructor(private val userRepository: User
             shoppingLists.value = shoppingLists.value!!.minus(it)
             shoppingListRepository.deleteShoppingList(it.id)
                 .enqueue(CallbackUtility<Boolean>("deleteShoppingList()",
-                    "Successfully deleted shopping list!", messageUtility
+                    "Successfully deleted shopping list!", messageUtility=messageUtility
                     ){})
         }
     }

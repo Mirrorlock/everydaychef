@@ -2,6 +2,7 @@ package com.everydaychef
 
 import android.app.Application
 import android.content.Context
+import com.everydaychef.main.helpers.firebase_messaging.ChannelsUtility
 import com.everydaychef.modules.AppModule
 
 
@@ -12,11 +13,14 @@ class EverydayChefApplication: Application(){
     }
 
     lateinit var appComponent: ApplicationComponent
+    lateinit var channelsUtility: ChannelsUtility
 
     override fun onCreate() {
         super.onCreate()
         appComponent = DaggerApplicationComponent.builder()
             .appModule(AppModule(this))
             .build()
+        channelsUtility = ChannelsUtility()
+        channelsUtility.createNotificationChannels(this)
     }
 }

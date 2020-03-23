@@ -26,7 +26,9 @@ class RegisterActivity : AppCompatActivity() {
             when(it){
                 AuthenticationState.INVALID_AUTHENTICATION ->
                     popupUtility.displayLongDefault(authViewModel.errorMessage)
-                AuthenticationState.MANUALLY_AUTHENTICATED -> returnToMain()
+                AuthenticationState.MANUALLY_AUTHENTICATED -> {
+                    returnToLogin()
+                }
             }
         })
     }
@@ -42,7 +44,9 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private fun returnToMain() {
+    private fun returnToLogin() {
+        authViewModel.currentUserLd.value = CurrentUser()
+        authViewModel.authenticationState.value = AuthenticationState.UNAUTHENTICATED
         findNavController(R.id.register_host).popBackStack()
         finish()
     }

@@ -1,5 +1,6 @@
 package com.everydaychef.main.ui.recipe.new_recipe
 
+import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -13,10 +14,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.everydaychef.EverydayChefApplication
 import com.everydaychef.R
+import com.everydaychef.main.MainActivity
 import com.everydaychef.main.helpers.MessageUtility
 import com.everydaychef.main.helpers.PermissionsUtility
 import kotlinx.android.synthetic.main.fragment_cook.*
@@ -117,6 +120,7 @@ class NewRecipeFragment : Fragment(){
 
 
     private fun chooseImage() {
+        Log.d("PRINT", "Checking for required permissions!")
         if(permissionsUtility.checkForStoragePermission(activity!!)){
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
