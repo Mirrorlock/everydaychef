@@ -33,7 +33,7 @@ class RecipeFragment: Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (activity!!.application as EverydayChefApplication).appComponent.inject(this)
-        recipeViewModel.setRecipe(args.recipeIndex)
+        recipeViewModel.setRecipe(args.recipeIndex, args.isFav)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

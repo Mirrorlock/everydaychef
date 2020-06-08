@@ -13,6 +13,7 @@ import com.everydaychef.main.helpers.firebase_messaging.MessageReceiver.Companio
 import com.everydaychef.main.helpers.firebase_messaging.MessageReceiver.Companion.TOKEN_KEY
 import com.everydaychef.main.models.Device
 import com.everydaychef.main.models.Family
+import com.everydaychef.main.models.Recipe
 import com.everydaychef.main.services.UserService
 import com.everydaychef.main.models.User
 import com.everydaychef.main.models.helper_models.JwtResponse
@@ -139,7 +140,7 @@ class UserRepository @Inject constructor (private val userService: UserService,
         }
         authenticationState.value =
             AuthenticationState.UNAUTHENTICATED
-
+        currentUserLd.value = CurrentUser()
     }
 
     private fun manuallySignOut() {
@@ -293,6 +294,12 @@ class UserRepository @Inject constructor (private val userService: UserService,
             }
         })
     }
+
+    fun getLikedRecipes(userId: Int): Call<ArrayList<Recipe>>{
+        return userService.getLikedRecipes(userId)
+    }
+
+
 }
 
 //

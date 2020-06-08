@@ -18,10 +18,10 @@ import kotlinx.android.synthetic.main.row_recipe.view.*
 import java.io.File
 import javax.inject.Inject
 
-class CookViewModel @Inject constructor(private val userRepository: UserRepository,
-                                        private val familyRepository: FamilyRepository,
-                                        private val recipeRepository: RecipeRepository,
-                                        private val messageUtility: MessageUtility) : ViewModel() {
+open class CookViewModel @Inject constructor(private val userRepository: UserRepository,
+                                             private val familyRepository: FamilyRepository,
+                                             private val recipeRepository: RecipeRepository,
+                                             private val messageUtility: MessageUtility) : ViewModel() {
     var recipes = MutableLiveData<ArrayList<Recipe>>()
 
 
@@ -34,7 +34,7 @@ class CookViewModel @Inject constructor(private val userRepository: UserReposito
             })
     }
 
-    fun rateRecipe(recipe: Recipe, likeButton: ImageView, isLike: Boolean,
+    open fun rateRecipe(recipe: Recipe, likeButton: ImageView, isLike: Boolean,
                     recipePosition: Int) {
         val successMessage = if(isLike) "Liked recipe" else "Disliked recipe"
         likeButton.isClickable = false
@@ -54,11 +54,4 @@ class CookViewModel @Inject constructor(private val userRepository: UserReposito
         return recipe.likedUsers.contains(userRepository.currentUserLd.value!!.user)
     }
 
-//    fun getLocalImage(view: View, pictureUrl: String) {
-//        Log.d("PRINT", "Started request for local image!")
-//        recipeRepository.getLocalImage(pictureUrl).enqueue(CallbackUtility<File>("getLocalImage",
-//            messageUtility = messageUtility){
-//            Log.d("PRINT", "Received file is: $it")
-//        })
-//    }
 }

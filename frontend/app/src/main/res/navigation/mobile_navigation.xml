@@ -10,6 +10,15 @@
         android:name="com.everydaychef.main.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_fragment_new_recipe"
+            app:destination="@id/fragment_new_recipe" />
+        <action
+            android:id="@+id/action_nav_home_to_recipe_fragment"
+            app:destination="@id/recipe_fragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit">
+        </action>
     </fragment>
 
     <fragment
@@ -44,6 +53,10 @@
         <argument
             android:name="recipeIndex"
             app:argType="integer" />
+        <argument
+            android:name="isFav"
+            app:argType="boolean"
+            />
     </fragment>
 
 
@@ -51,8 +64,7 @@
         android:id="@+id/fragment_new_recipe"
         android:name="com.everydaychef.main.ui.recipe.new_recipe.NewRecipeFragment"
         android:label="New Recipe"
-        tools:layout="@layout/fragment_new_recipe" >
-    </fragment>
+        tools:layout="@layout/fragment_new_recipe" />
 
     <fragment
         android:id="@+id/nav_shopping_list"
@@ -60,11 +72,6 @@
         android:label="@string/menu_shopping_list"
         tools:layout="@layout/fragment_shopping_list" />
 
-    <fragment
-        android:id="@+id/nav_share"
-        android:name="com.everydaychef.main.ui.share.ShareFragment"
-        android:label="@string/menu_share"
-        tools:layout="@layout/fragment_share" />
 
     <fragment
         android:id="@+id/nav_send"

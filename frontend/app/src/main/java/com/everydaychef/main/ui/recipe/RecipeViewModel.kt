@@ -19,8 +19,12 @@ class RecipeViewModel @Inject constructor(private val userRepository: UserReposi
     lateinit var recipe: Recipe
     val shoppingLists = MutableLiveData<List<ShoppingList>>()
 
-    fun setRecipe(recipeIndex: Int) {
-        recipe = recipeRepository.recipes[recipeIndex]
+    fun setRecipe(recipeIndex: Int, isFav: Boolean) {
+        if(isFav){
+            recipe = recipeRepository.favRecipes[recipeIndex]
+        }else{
+            recipe = recipeRepository.recipes[recipeIndex]
+        }
         Log.d("PRINT", "Displaying recipe: $recipe")
     }
 

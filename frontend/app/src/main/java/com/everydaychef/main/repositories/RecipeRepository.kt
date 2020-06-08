@@ -15,9 +15,15 @@ import javax.inject.Singleton
 class RecipeRepository @Inject constructor(private val recipeService: RecipeService){
     var recipes = ArrayList<Recipe>()
 
+    var favRecipes = ArrayList<Recipe>()
     fun getAllRecipes(): Call<ArrayList<Recipe>> {
         return recipeService.getAllRecipes()
     }
+
+//
+//    fun getLikedRecipes(userId: Int): Call<ArrayList<Recipe>>{
+//        return userService.getLikedRecipes()
+//    }
 
     fun rateRecipe(recipeId: Int, userId: Int, isLike: Boolean): Call<Recipe>{
         return recipeService.rateRecipe(recipeId, userId, if(isLike) "like" else "dislike")
@@ -38,6 +44,9 @@ class RecipeRepository @Inject constructor(private val recipeService: RecipeServ
     fun addToShoppingList(recipeId: Int, shoppingListId: Int) : Call<Any>{
         return recipeService.addToShoppingList(recipeId, shoppingListId)
     }
+
+
+
 //    fun getLocalImage(pictureUrl: String) : Call<File>{
 //        return recipeService.getLocalImage(pictureUrl)
 //    }

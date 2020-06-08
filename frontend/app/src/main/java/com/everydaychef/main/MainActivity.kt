@@ -29,7 +29,6 @@ import com.everydaychef.auth.AuthViewModel
 import com.everydaychef.auth.LoginActivity
 import com.everydaychef.main.helpers.PopupUtility
 import com.everydaychef.main.helpers.firebase_messaging.ChannelsUtility
-import com.everydaychef.main.ui.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
@@ -59,7 +58,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
                 R.id.nav_fridge,
                 R.id.nav_cook,
                 R.id.nav_shopping_list,
-                R.id.nav_share,
                 R.id.nav_send,
                 R.id.nav_profile
             ), drawer_layout
@@ -131,10 +129,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ViewModelStoreOw
         }
     }
 
-    fun showSettings(item: MenuItem) {
-        intent = Intent(this, SettingsActivity::class.java)
-        startActivity(intent)
-    }
 }
 
 

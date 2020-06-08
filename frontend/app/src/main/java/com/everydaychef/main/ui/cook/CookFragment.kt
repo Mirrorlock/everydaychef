@@ -1,5 +1,6 @@
 package com.everydaychef.main.ui.cook
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import com.everydaychef.EverydayChefApplication
 import com.everydaychef.R
 import com.everydaychef.main.helpers.MessageUtility
@@ -43,12 +45,15 @@ class CookFragment : Fragment() {
                 progressBar.visibility = View.GONE
                 Log.println(Log.DEBUG, "PRINT", "Found recipes: $it")
                 if(recipes_list_view.adapter == null)
-                    recipes_list_view.adapter = CookDataAdapter(context!!, R.layout.row_recipe, it, cookViewModel)
+                    recipes_list_view.adapter = CookDataAdapter(context!!,
+                        R.layout.row_recipe, it, cookViewModel){
+                        val action = CookFragmentDirections.actionNavCookToRecipeFragment(it, false)
+                        (context as Activity).findNavController(R.id.nav_host_fragment).navigate(action)
+                    }
                 else{
                     (recipes_list_view.adapter as CookDataAdapter).notifyDataSetChanged()
                 }
             }
         })
     }
-
 }

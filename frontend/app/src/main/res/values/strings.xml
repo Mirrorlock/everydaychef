@@ -24,20 +24,4 @@
     <string name="facebook_app_id">195155534903437</string>
     <string name="fb_login_protocol_scheme">fb195155534903437</string>
     <string name="google_server_client_id">37840691909-j333t8b7p9c488lne7n9gv6lr1k8f8uh.apps.googleusercontent.com</string>
-    <string name="title_activity_settings">Settings</string>
-
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

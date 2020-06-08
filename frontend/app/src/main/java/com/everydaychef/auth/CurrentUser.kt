@@ -16,7 +16,7 @@ class CurrentUser{
     }
 
     override fun toString(): String {
-        return "CurrentUser(username='$username', email='$email', photoUrl='$photoUrl')"
+        return "CurrentUser(id=$id, username='$username', email='$email', photoUrl='$photoUrl', userSignedIn=${isUserSigned()})"
     }
 
 }

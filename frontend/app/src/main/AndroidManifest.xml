@@ -68,15 +68,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.everydaychef.main.ui.settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".main.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.everydaychef.main.MainActivity" />
-        </activity>
-
         <service android:name=".main.helpers.firebase_messaging.MessageReceiver">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>

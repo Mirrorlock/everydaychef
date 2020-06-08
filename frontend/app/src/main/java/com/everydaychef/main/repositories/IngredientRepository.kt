@@ -17,19 +17,5 @@ class IngredientRepository @Inject constructor(private val ingredientService: In
                                                private val messageUtility: MessageUtility){
     fun getAllIngredients(): Call<ArrayList<Ingredient>>{
         return ingredientService.getAllIngredients()
-//            var ingredients = ArrayList<Ingredient>()
-//            val receivedItemsThread = Thread{
-//                ingredients = ingredientService.getAllIngredients()
-//                    .execute().body()
-//            }
-//
-//            receivedItemsThread.start()
-//            receivedItemsThread.join()
-//            if(ingredients.isEmpty()){
-//                messageUtility.setMessage("There was an Error!")
-//            }
-//            Log.println(Log.DEBUG,"PRINT", "Items received are " +
-//            ingredients.toString())
-//            return ingredients
     }
 }

@@ -1,6 +1,7 @@
 package com.everydaychef.main.services
 
 import com.everydaychef.main.models.Family
+import com.everydaychef.main.models.Recipe
 import com.everydaychef.main.models.User
 import com.everydaychef.main.models.helper_models.JwtResponse
 import com.google.gson.JsonObject
@@ -19,6 +20,10 @@ interface UserService {
 
     @GET("user/{userId}/invitations")
     fun getInvitations(@Path("userId") userId: Int): Call<ArrayList<Family>>
+
+
+    @GET("user/{userId}/recipes/liked")
+    fun getLikedRecipes(@Path("userId") userId: Int): Call<ArrayList<Recipe>>
 
     @POST("user")
     fun create(@Body body: HashMap<String, String>): Call<User>

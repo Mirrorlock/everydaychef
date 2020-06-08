@@ -14,9 +14,8 @@ interface RecipeService {
     @GET("recipes")
     fun getAllRecipes(): Call<ArrayList<Recipe>>
 
-//    @GET("recipe/{pictureUrl}/image")
-//    fun getLocalImage(@Path("pictureUrl") pictureUrl: String): Call<File>
 
+//    fun getLocalImage(@Path("pictureUrl") pictureUrl: String): Call<File>
 
     @PUT("recipe/{recipeId}/user/{userId}/{rate}")
     fun rateRecipe(@Path("recipeId") recipeId: Int,

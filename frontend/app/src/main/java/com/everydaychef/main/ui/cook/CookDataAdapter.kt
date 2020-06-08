@@ -25,7 +25,8 @@ import retrofit2.Retrofit
 class CookDataAdapter(context: Context,
                       private val resource: Int,
                       private val objects: MutableList<Recipe>,
-                      private val viewModel: CookViewModel) :
+                      private val viewModel: CookViewModel,
+                      private val clickFunc: (position: Int) -> Unit) :
     ArrayAdapter<Recipe>(context, resource, objects) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -43,9 +44,8 @@ class CookDataAdapter(context: Context,
         rowView.recipe_name.text = recipe.name
         rowView.recipe_author_name.text = recipe.creator?.name ?: ""
         rowView.recipe_likes_number.text = recipe.number_of_likes.toString()
-        rowView.recipe_image.setOnClickListener {
-            val action = CookFragmentDirections.actionNavCookToRecipeFragment(position)
-            (context as Activity).findNavController(R.id.nav_host_fragment).navigate(action)
+        rowView.recipe_image.setOnClickListener{
+            clickFunc(position)
         }
         val hasUserLiked = viewModel.hasUserLiked(recipe)
 
