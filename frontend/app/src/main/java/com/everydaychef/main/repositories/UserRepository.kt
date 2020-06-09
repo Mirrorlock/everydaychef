@@ -140,7 +140,6 @@ class UserRepository @Inject constructor (private val userService: UserService,
         }
         authenticationState.value =
             AuthenticationState.UNAUTHENTICATED
-        currentUserLd.value = CurrentUser()
     }
 
     private fun manuallySignOut() {
@@ -298,8 +297,6 @@ class UserRepository @Inject constructor (private val userService: UserService,
     fun getLikedRecipes(userId: Int): Call<ArrayList<Recipe>>{
         return userService.getLikedRecipes(userId)
     }
-
-
 }
 
 //

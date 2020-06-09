@@ -28,8 +28,9 @@ class CallbackUtility<T> constructor(private val callerFuncName: String,
                 if(successMessage.isNotEmpty())
                 messageUtility.setMessage(successMessage)
             }else if(response.code() in 401..499){
-                if(errorMessage.isNotEmpty())
-                messageUtility.setMessage(errorMessage)
+                if(errorMessage.isNotEmpty()){
+                    messageUtility.setMessage(errorMessage)
+                }
             }else{
                 messageUtility.setMessage("Error in server!")
             }

@@ -61,22 +61,24 @@ class HomeFragment : Fragment(), View.OnClickListener {
         })
 
         homeViewModel.favRecipes.observe(viewLifecycleOwner, Observer{
+            favRecProgressBar.visibility = View.GONE
             if(it.isNotEmpty()){
-                favRecProgressBar.visibility = View.GONE
-                Log.println(Log.DEBUG, "PRINT", "Fav recipes changed to: $it")
+                empty_favourites_text_view.visibility = View.GONE
                 if(favourite_recipes_list_view.adapter == null){
+                    Log.println(Log.DEBUG, "PRINT", "Fav recipes adapter created with: $it")
                     favourite_recipes_list_view.adapter = CookDataAdapter(context!!,
                         R.layout.row_recipe, it, homeViewModel) {
                         val action = HomeFragmentDirections.actionNavHomeToRecipeFragment(it, true)
                         (context as Activity).findNavController(R.id.nav_host_fragment).navigate(action)
                     }
                 }else{
+                    Log.println(Log.DEBUG, "PRINT", "Fav recipes changed to: $it")
                     (favourite_recipes_list_view.adapter as CookDataAdapter).notifyDataSetChanged()
                 }
+            }else{
+                empty_favourites_text_view.visibility = View.VISIBLE
             }
         })
-
-
     }
 
     override fun onClick(p0: View?) {

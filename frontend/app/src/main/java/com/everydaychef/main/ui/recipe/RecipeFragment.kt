@@ -53,7 +53,6 @@ class RecipeFragment: Fragment() {
 
     private fun addToShoppingList() {
         recipeViewModel.getShoppingLists()
-
         recipeViewModel.shoppingLists.observe(viewLifecycleOwner, Observer {
             Log.d("PRINT", "Detected change in shopping lists: $it")
             if(it != null){

@@ -28,6 +28,17 @@
         android:textSize="@dimen/big_text"
         android:fontFamily="cursive"/>
 
+    <TextView
+        android:id="@+id/empty_favourites_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Your favourites will show here"
+        android:textSize="@dimen/big_text"
+        android:fontFamily="cursive"/>
+
     <ProgressBar
         android:id="@+id/favRecProgressBar"
         style="?android:attr/progressBarStyle"

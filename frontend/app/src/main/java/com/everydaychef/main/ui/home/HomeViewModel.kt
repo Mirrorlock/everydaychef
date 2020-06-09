@@ -25,9 +25,10 @@ class HomeViewModel @Inject constructor(private val userRepository: UserReposito
 
 
     fun getFavouriteRecipes(){
+        Log.println(Log.DEBUG, "PRINT", "Sending request for userId: " + userRepository.currentUserLd.value!!.id)
         userRepository.getLikedRecipes(userRepository.currentUserLd.value!!.id)
-            .enqueue(CallbackUtility<ArrayList<Recipe>>("getFavouriteRecipes"
-                ,messageUtility = messageUtility){
+            .enqueue(CallbackUtility<ArrayList<Recipe>>("getFavouriteRecipes",
+                messageUtility = messageUtility){
                 Log.println(Log.DEBUG, "PRINT", "Found favourite recipes: $it")
                 favRecipes.value = it
                 recipeRepository.favRecipes = it
@@ -37,7 +38,7 @@ class HomeViewModel @Inject constructor(private val userRepository: UserReposito
     override
     fun rateRecipe(recipe: Recipe, likeButton: ImageView, isLike: Boolean,
                    recipePosition: Int) {
-        
+        //the button is supposed to do nothing and just show the number of likes.
     }
 
 }
